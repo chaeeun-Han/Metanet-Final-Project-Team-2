@@ -8,10 +8,14 @@ import org.springframework.stereotype.Repository;
 
 import com.example.myapp.board.model.Board;
 import com.example.myapp.board.model.BoardUploadFile;
+import com.example.myapp.board.model.S3Images;
 
 @Repository
 @Mapper
 public interface IBoardRepository {
+	
+	void insertS3Images(String imageUrl);
+	
 	int selectMaxArticleNo();
 	int selectMaxFileId();
 	

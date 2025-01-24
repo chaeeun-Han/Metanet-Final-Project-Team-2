@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,19 +21,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.myapp.board.model.Board;
 import com.example.myapp.board.model.BoardCategory;
 import com.example.myapp.board.model.BoardUploadFile;
+import com.example.myapp.board.model.S3Images;
 import com.example.myapp.board.service.IBoardCategoryService;
 import com.example.myapp.board.service.IBoardService;
 
 import jakarta.servlet.http.HttpServletRequest; // tomcat 9이하면 javax.servlet
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
-@Controller
+@Slf4j
+@RestController
 public class BoardController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -43,6 +46,19 @@ public class BoardController {
 	
 	@Autowired
 	IBoardCategoryService categoryService;
+	
+	// 파일 업로드
+	@PostMapping(value = "/files", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<Void> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+		ResponseEntity<Void> response;
+		try {
+			response = boardService.uploadFiles(files);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			return null;
+		}
+	    return response;
+	}
 		
 	@GetMapping("/board/cat/{categoryId}/{page}")
 	public String getListByCategory(@PathVariable int categoryId, @PathVariable int page, HttpSession session, Model model) {
