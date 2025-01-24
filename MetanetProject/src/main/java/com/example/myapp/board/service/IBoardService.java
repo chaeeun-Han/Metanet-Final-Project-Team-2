@@ -2,10 +2,17 @@ package com.example.myapp.board.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.myapp.board.model.Board;
 import com.example.myapp.board.model.BoardUploadFile;
+import com.example.myapp.board.model.S3Images;
 
 public interface IBoardService {
+	
+	ResponseEntity<Void> uploadFiles(List<MultipartFile> files);
+	
 	void insertArticle(Board boardId);
 	void insertArticle(Board boardId, BoardUploadFile file);
 	

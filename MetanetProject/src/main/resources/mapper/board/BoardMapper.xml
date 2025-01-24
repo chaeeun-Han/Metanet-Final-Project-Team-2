@@ -3,6 +3,18 @@
     "../mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.myapp.board.dao.IBoardRepository">
+
+	<!-- insertS3Images 데이터 저장 -->
+    <insert id="insertS3Images" parameterType="com.example.myapp.board.model.S3Images">
+        INSERT INTO s3_images (
+            image_url,
+            image_created
+        ) VALUES (
+            #{imageUrl},
+            NOW()
+        )
+    </insert>
+    
 	<insert id="insertFileData" parameterType="com.example.myapp.board.model.BoardUploadFile">
 	<![CDATA[
 		INSERT INTO board_upload_file 
