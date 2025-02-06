@@ -5,20 +5,22 @@
 <mapper namespace="com.example.myapp.aop.IAopRepository">
 
 	<insert id="insertLog" parameterType="com.example.myapp.aop.Log">
-		INSERT INTO log (
+		INSERT INTO logs (
 			request_url,
             request_method,
             response_status,
             client_ip,
             request_time,
-            response_time
+            response_time,
+            service_name
 		) VALUES (
 			#{requestUrl},
             #{requestMethod},
             #{responseStatus},
             #{clientIp},
             #{requestTime},
-            #{responseTime}
+            #{responseTime},
+            #{serviceName}
 		)
 	</insert>
 	
@@ -30,8 +32,9 @@
             response_status AS responseStatus,
             client_ip AS clientIp,
             request_time AS requestTime,
-            response_time AS responseTime
-        FROM log
+            response_time AS responseTime,
+            service_name AS serviceName
+        FROM logs
         WHERE log_id = #{logId}
 	</select>
 	
@@ -43,8 +46,9 @@
             response_status AS responseStatus,
             client_ip AS clientIp,
             request_time AS requestTime,
-            response_time AS responseTime
-        FROM log
+            response_time AS responseTime,
+            service_name AS serviceName
+        FROM logs
         ORDER BY request_time DESC
 	</select>
 
