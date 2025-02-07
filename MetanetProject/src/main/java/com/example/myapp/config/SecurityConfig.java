@@ -42,7 +42,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
 	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
 				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
-	            .requestMatchers("/admin/**").hasAnyRole("Admin")
+				.requestMatchers("/revenue").hasAnyRole("Teacher", "Admin")
+	            .requestMatchers("/admin/**").hasRole("Admin")
 				.requestMatchers("/lecture/all", "lecture/{lecture_id}", "lecture/like/**").permitAll()
 				// .requestMatchers("/board/test").hasAnyRole("User", "Teacher")
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요

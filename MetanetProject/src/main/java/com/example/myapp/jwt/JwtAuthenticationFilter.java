@@ -25,7 +25,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
 	private final JwtTokenProvider jwtTokenProvider;
-
+	
+	public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
+			"/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password");
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 	        throws IOException, ServletException {
@@ -34,7 +37,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
 	    // 2. 허용된 URL일 경우 JWT 토큰 검증을 건너뛰기
 	    String requestURI = ((HttpServletRequest) request).getRequestURI();	   
-	    List<String> acceptedUrls = AcceptedUrl.ACCEPTED_URL_LIST;
+	    List<String> acceptedUrls = ACCEPTED_URL_LIST;
 
 
 	    boolean isAcceptedUrl = false; 
@@ -77,9 +80,5 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 		return null;
 	}
 
-	// 허용 URL 정보
-	public class AcceptedUrl {
-		public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
-				"/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password");
-	}
+
 }

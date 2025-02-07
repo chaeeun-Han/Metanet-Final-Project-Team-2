@@ -17,6 +17,7 @@ import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.member.model.Member;
 import com.example.myapp.member.service.IMemberService;
+import com.example.myapp.util.GetAuthenUser;
 import com.example.myapp.util.RegexUtil;
 
 import jakarta.servlet.http.Cookie;
@@ -236,50 +237,63 @@ public class AuthRestController {
 	// 회원 삭제 - 신영서
 	@DeleteMapping("/delete")
 	public ResponseEntity<ResponseDto> deleteMember(HttpServletRequest request, HttpServletResponse response) {
-	    Cookie[] cookies = request.getCookies();
+		Cookie[] cookies = request.getCookies();
 
-	    String refreshToken = null;
+		String refreshToken = null;
 
-	    // 쿠키에 refreshToken이 있을 경우 처리
-	    if (cookies != null) {
-	        for (Cookie cookie : cookies) {
-	            if ("refreshToken".equals(cookie.getName())) {
-	                refreshToken = cookie.getValue();
+		// 쿠키에 refreshToken이 있을 경우 처리
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if ("refreshToken".equals(cookie.getName())) {
+					refreshToken = cookie.getValue();
 
-	                // 리프레시 토큰 유효성 검사 (블랙리스트 체크 또는 Redis에서 유효한 토큰인지 확인)
-	                boolean isValid = memberService.checkRefreshTokenValidity(refreshToken);
-	                if (!isValid) {
-	                    return ResponseEntity.badRequest()
-	                            .body(new ResponseDto("INVALID_TOKEN", "Refresh token is invalid or expired"));
-	                }
+					// 리프레시 토큰 유효성 검사 (블랙리스트 체크 또는 Redis에서 유효한 토큰인지 확인)
+					boolean isValid = memberService.checkRefreshTokenValidity(refreshToken);
+					if (!isValid) {
+						return ResponseEntity.badRequest()
+								.body(new ResponseDto("INVALID_TOKEN", "Refresh token is invalid or expired"));
+					}
 
-	                // 리프레시 토큰 쿠키 삭제 처리
-	                cookie.setMaxAge(0);
-	                cookie.setPath("/");
-	                cookie.setHttpOnly(true);
-	                cookie.setSecure(true);
+					// 리프레시 토큰 쿠키 삭제 처리
+					cookie.setMaxAge(0);
+					cookie.setPath("/");
+					cookie.setHttpOnly(true);
+					cookie.setSecure(true);
 
-	                // 클라이언트에 삭제된 쿠키 전달
-	                response.addCookie(cookie);
-	            }
-	        }
-	    }
+					// 클라이언트에 삭제된 쿠키 전달
+					response.addCookie(cookie);
+				}
+			}
+		}
 
-	    // 리프레시 토큰이 없을 경우
-	    if (refreshToken == null) {
-	        return ResponseEntity.badRequest().body(new ResponseDto("AUTHORIZATION_FAIL", "No refresh token found"));
-	    }
+		// 리프레시 토큰이 없을 경우
+		if (refreshToken == null) {
+			return ResponseEntity.badRequest().body(new ResponseDto("AUTHORIZATION_FAIL", "No refresh token found"));
+		}
 
-	    // 회원 삭제 처리
-	    boolean isDeleted = memberService.deleteMemberByToken(refreshToken);
-	    if (!isDeleted) {
-	        return ResponseEntity.badRequest()
-	                .body(new ResponseDto("DELETE_FAILED", "Failed to delete member"));
-	    }
+		// 회원 삭제 처리
+		boolean isDeleted = memberService.deleteMemberByToken(refreshToken);
+		if (!isDeleted) {
+			return ResponseEntity.badRequest().body(new ResponseDto("DELETE_FAILED", "Failed to delete member"));
+		}
 
-	    // 회원 삭제 성공 응답
-	    return ResponseEntity.ok().body(new ResponseDto("SUCCESS", "Member successfully deleted"));
+		// 회원 삭제 성공 응답
+		return ResponseEntity.ok().body(new ResponseDto("SUCCESS", "Member successfully deleted"));
 	}
 
+	// 이메일 재설정 - 신영서
+	@PostMapping("/email")
+	public ResponseEntity<ResponseDto> resetEmail(@RequestBody Member member) {
+		String user = GetAuthenUser.getAuthenUser();
 
+		if (user == null) {
+			return ResponseDto.noAuthentication();
+		}
+		// 이메일 검증
+		if (member.getEmail() != null && !regexUtil.checkEmail(member.getEmail())) {
+			return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Email value not match Regex"));
+		}
+
+		return memberService.resetEmail(user, member.getEmail());		
+	}
 }

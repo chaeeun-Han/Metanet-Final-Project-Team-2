@@ -306,6 +306,26 @@
         SELECT COUNT(*) > 0 FROM attends WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
     ]]>
     </select>
+    
+	<select id="getSalesForMember" resultType="com.example.myapp.lecture.model.LectureRevenueDto">
+    <![CDATA[
+		SELECT 
+		    DATE_FORMAT(l.start_date, '%Y-%m') AS month, 
+		    l.lecture_id AS lectureId, 
+		    l.title AS title, 
+		    CASE WHEN l.status = true THEN '강의중' ELSE '강의 종료' END AS status,
+		    COALESCE(SUM(CASE WHEN p.status = false THEN p.price * 0.9 ELSE 0 END), 0) AS price
+		FROM lectures l
+		LEFT JOIN pays p ON l.lecture_id = p.lecture_id
+		WHERE 
+		    l.member_id = #{memberId}
+		    AND l.start_date BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 6 MONTH), '%Y-%m-01') 
+		                         AND LAST_DAY(NOW())
+		GROUP BY month, l.lecture_id, l.title, l.status
+		ORDER BY price DESC;
+    ]]>
+    </select>
+
 
     <insert id="insertPayLog" parameterType="map">
         <![CDATA[

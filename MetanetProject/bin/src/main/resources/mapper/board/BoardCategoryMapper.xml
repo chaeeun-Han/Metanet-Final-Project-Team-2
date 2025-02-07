@@ -35,7 +35,7 @@
 	<update id="updateCategory" parameterType="com.example.myapp.board.model.BoardCategory">
 	<![CDATA[
 		UPDATE board_category
-		SET
+		SET 
 			category_name = #{categoryName}, 
 			category_description = #{categoryDescription}
 		WHERE

@@ -28,6 +28,8 @@ public interface IMemberRepository{
 	
 	void deleteMember(String id);
 
+	void resetEmail(String email, Long memberUID);
+
 	Long getMemberIdById(String memberId);
 	
 	List<MemberResponse> getAllMembers();

@@ -51,4 +51,18 @@ public class EmailController {
 		return response;
 	}
 
+	// 이메일 변경 인증번호
+	@PostMapping("/mail-email")
+	public ResponseEntity<ResponseDto> mailEmail(@RequestBody Email email) throws MessagingException {
+
+		if (memberService.findByEmail(email.getEmail()) == false) {
+			return ResponseDto.notExistEmail();
+		}
+
+		ResponseEntity<ResponseDto> response = memberService.sendEmail("email", email.getEmail());
+
+		return response;
+	}
+
+	
 }

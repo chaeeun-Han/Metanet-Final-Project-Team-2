@@ -11,6 +11,7 @@ import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
 import com.example.myapp.lecture.model.LectureReminderDto;
 import com.example.myapp.lecture.model.LectureScheduled;
+import com.example.myapp.lecture.model.LectureRevenueDto;
 
 @Repository
 @Mapper
@@ -64,6 +65,8 @@ public interface ILectureRepository {
     void payRefund(Map<String, Long> params);
 
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
+    
+    List<LectureRevenueDto> getSalesForMember(Long memberId);
 
     void insertPayLog(Map<String, Long> params);
 

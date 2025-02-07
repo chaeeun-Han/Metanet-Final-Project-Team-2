@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.myapp.cart.model.CartDeleteRequest;
 import com.example.myapp.cart.service.ICartService;
 import com.example.myapp.common.response.ResponseDto;
+import com.example.myapp.util.GetAuthenUser;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,22 +30,11 @@ public class CartController {
 	// 장바구니 조회
 	@GetMapping
 	public ResponseEntity<ResponseDto> getCarts() {
-		String memberId = null;
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-        try {
-            if (authentication != null) {
-                // 현재 인증된 사용자 정보
-                memberId = authentication.getName();
-                log.info(memberId);
-            }
-
-            if (memberId == null)
-                return ResponseDto.noAuthentication();
-        } catch (Exception exception) {
-            log.info(exception.getMessage());
-            return ResponseDto.databaseError();
-        }
+		String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
 
         ResponseEntity<ResponseDto> response = cartService.getCarts(memberId);
         return response;
@@ -53,21 +43,12 @@ public class CartController {
 	// 장바구니 추가
 	@PostMapping
 	public ResponseEntity<ResponseDto> addCart(@RequestParam String lectureId) {
-		String memberId = null;
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		log.info(lectureId);
-        try {
-            if (authentication != null) {
-                // 현재 인증된 사용자 정보
-                memberId = authentication.getName();
-            }
+		String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
 
-            if (memberId == null)
-                return ResponseDto.noAuthentication();
-        } catch (Exception exception) {
-            log.info(exception.getMessage());
-            return ResponseDto.databaseError();
-        }
 
         ResponseEntity<ResponseDto> response = cartService.addCart(memberId, lectureId);
         return response;
@@ -76,21 +57,12 @@ public class CartController {
 	// 장바구니 삭제
 	@DeleteMapping
 	public ResponseEntity<ResponseDto> deleteCarts(@RequestBody CartDeleteRequest request) {
-		String memberId = null;
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-        try {
-            if (authentication != null) {
-                // 현재 인증된 사용자 정보
-                memberId = authentication.getName();
-            }
+		String memberId =  GetAuthenUser.getAuthenUser();
+		// 인증되지 않은 경우는 바로 처리
+	    if (memberId == null) {
+	        return ResponseDto.noAuthentication();
+	    }
 
-            if (memberId == null)
-                return ResponseDto.noAuthentication();
-        } catch (Exception exception) {
-            log.info(exception.getMessage());
-            return ResponseDto.databaseError();
-        }
 
         ResponseEntity<ResponseDto> response = cartService.deleteCarts(memberId, request.getCartIds());
         return response;

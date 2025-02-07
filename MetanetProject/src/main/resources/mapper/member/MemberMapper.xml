@@ -49,6 +49,12 @@
 		]]>
 	</select>
 	
+	<update id="resetEmail">
+		UPDATE members
+		(email) SET #{email}
+		WHERE member_id = #{memberUID}  
+	</update>
+
 	<select id="getAllMembers" resultType="com.example.myapp.member.model.MemberResponse">
 		<![CDATA[
 			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
@@ -70,5 +76,4 @@
         	WHERE role <> 'admin'
 		]]>
 	</delete>
-	
 </mapper>
