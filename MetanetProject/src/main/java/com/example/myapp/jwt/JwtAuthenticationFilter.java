@@ -29,7 +29,7 @@ private final JwtTokenProvider jwtTokenProvider;
    private final AntPathMatcher pathMatcher = new AntPathMatcher();
    public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
            "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",
-           "/ws/**", "lectures/all");
+           "/ws/**", "lectures/all", "/zoom/auth", "/zoom/oauth2/callback", "/error", "/favicon.ico");
 
    @Override
    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -57,7 +57,7 @@ private final JwtTokenProvider jwtTokenProvider;
        
        if (!isAcceptedUrl && "GET".equalsIgnoreCase(method)) {
            if (pathMatcher.match("lectures/**", requestURI) ||  // 전체 lectures 경로 허용
-               pathMatcher.match("lectures/**/reviews", requestURI) ||
+               pathMatcher.match("lectures/*/reviews", requestURI) ||
                pathMatcher.match("/lectures/*/questions", requestURI) ||
                pathMatcher.match("/lectures/*/questions/*", requestURI)) {
                isAcceptedUrl = true;

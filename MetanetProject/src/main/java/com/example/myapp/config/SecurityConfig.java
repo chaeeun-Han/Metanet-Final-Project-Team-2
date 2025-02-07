@@ -44,7 +44,7 @@ public class SecurityConfig {
 				.requestMatchers("/email/**").permitAll()
 				.requestMatchers("/lectures/all").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/**").permitAll()
-				.requestMatchers(HttpMethod.GET, "lectures/**/reviews").permitAll()
+				.requestMatchers(HttpMethod.GET, "lectures/*/reviews").permitAll()
 				.requestMatchers("/lectures/likes/**").hasAnyRole("Student", "Teacher", "Admin")
 				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
 	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
