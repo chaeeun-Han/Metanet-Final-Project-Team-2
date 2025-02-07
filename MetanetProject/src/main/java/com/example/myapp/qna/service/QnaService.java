@@ -1,8 +1,9 @@
 package com.example.myapp.qna.service;
 
-import java.util.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.myapp.common.response.ResponseCode;
 import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.common.response.ResponseMessage;
+import com.example.myapp.lecture.dao.ILectureRepository;
+import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.qna.dao.IQnaRepository;
 import com.example.myapp.qna.model.Answer;
 import com.example.myapp.qna.model.AnswerDetail;
 import com.example.myapp.qna.model.AnswerUpdateRequest;
+import com.example.myapp.qna.model.Notification;
 import com.example.myapp.qna.model.Question;
 import com.example.myapp.qna.model.QuestionDetail;
 import com.example.myapp.qna.model.QuestionSummary;
@@ -39,6 +43,9 @@ public class QnaService implements IQnaService {
 	
 	@Autowired
 	private S3FileUploader s3FileUploader;
+	
+	@Autowired
+	private ILectureRepository lectureRepository;
 
 	//질문 등록 - 소진
 	@Override
@@ -63,17 +70,18 @@ public class QnaService implements IQnaService {
 		}
 		
 		//알림 생성
-//		Notification notification = new Notification();
-//		notification.setMessage(question.getLecture() 
-//				+ "강의에 질문이 등록되었습니다.");
-//		notification.setTimestamp(LocalDateTime.now());
-//		
-//		//강의자에게 알림 전송
-//		messagingTemplate.convertAndSendToUser(
-//				question.getTeacher(),
-//				"queue/notifications",
-//				notification
-//		);
+		Lecture lecture = lectureRepository.getLectureDetail(lectureId);
+        String receiverUsername = memberRepository.getIdByMemberId(lecture.getMemberId());
+
+        Notification notification = new Notification();
+        notification.setMessage("['" + lecture.getTitle() + "' 강의에 질문이 등록되었습니다]  " + question.getTitle());
+        notification.setTimestamp(LocalDateTime.now());
+
+        //자기 강의에 자기가 질문 등록하면 알림X
+        if (!receiverUsername.equals(memberId)) {
+            messagingTemplate.convertAndSendToUser(receiverUsername, "/queue/notifications", notification);
+        }
+
 		return ResponseDto.success();
 	}
 	
@@ -103,19 +111,21 @@ public class QnaService implements IQnaService {
 			exception.printStackTrace();
 			return ResponseDto.databaseError();
 		}
-		
+
 		//알림 생성
-//		Notification notification = new Notification();
-//		notification.setMessage(answer.getWriter()
-//				+ "님이 답변을 등록했습니다.");
-//		notification.setTimestamp(LocalDateTime.now());
-//		
-//		//학생에게 알림 전송
-//		messagingTemplate.convertAndSendToUser(
-//				answer.getQuestionWriter(),
-//				"queue/notifications",
-//				notification
-//		);
+		Long questionMemberUID = qnaRepository.getMemberIdByQuestionId(questionId);
+		String receiverUsername = memberRepository.getIdByMemberId(questionMemberUID);
+		String questionTitle = qnaRepository.getQuestionTitle(questionId);
+		Notification notification = new Notification();
+		notification.setMessage("['" + questionTitle + "' 질문에 " + memberId
+				+ "님이 답변을 등록했습니다] " + answer.getContent());
+		notification.setTimestamp(LocalDateTime.now());
+		
+		//자기가 쓴 글에 자기가 답변 등록하면 알림 전송X
+		if (!receiverUsername.equals(memberId)) {
+			//학생에게 알림 전송
+			messagingTemplate.convertAndSendToUser(receiverUsername, "/queue/notifications", notification);
+		}
 		return ResponseDto.success();
 	}
 

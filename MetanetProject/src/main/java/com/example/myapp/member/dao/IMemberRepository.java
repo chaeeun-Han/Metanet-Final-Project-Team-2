@@ -36,4 +36,5 @@ public interface IMemberRepository{
 	void forceDeleteMember(Long memberId);
 	void deleteAllMembers();
 	
+	String getIdByMemberId(Long memberId);
 }

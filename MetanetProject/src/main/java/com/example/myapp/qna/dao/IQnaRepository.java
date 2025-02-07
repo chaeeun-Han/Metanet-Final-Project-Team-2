@@ -32,4 +32,5 @@ public interface IQnaRepository {
 	void updateAnswer(@Param("answerId") Long answerId, @Param("answerUpdateRequest") AnswerUpdateRequest answerUpdateRequest);
 	Long getMemberIdByAnswerId(Long answerId);
 	void deleteAnswer(Long answerId);
+	String getQuestionTitle(Long questionId);
 }

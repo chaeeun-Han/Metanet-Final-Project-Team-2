@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -24,61 +25,60 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
-	private final JwtTokenProvider jwtTokenProvider;
-	
-	public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
-			"/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password");
-	
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-	        throws IOException, ServletException {
-	    // 1. Request Header에서 JWT 토큰 추출
-	    String token = resolveToken((HttpServletRequest) request);
+private final JwtTokenProvider jwtTokenProvider;
+   private final AntPathMatcher pathMatcher = new AntPathMatcher();
+   public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
+           "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",
+           "/ws/**");
 
-	    // 2. 허용된 URL일 경우 JWT 토큰 검증을 건너뛰기
-	    String requestURI = ((HttpServletRequest) request).getRequestURI();	   
-	    List<String> acceptedUrls = ACCEPTED_URL_LIST;
+   @Override
+   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+           throws IOException, ServletException {
+       // 1. Request Header에서 JWT 토큰 추출
+       String token = resolveToken((HttpServletRequest) request);
 
-
-	    boolean isAcceptedUrl = false; 
-
-	    // 허용된 URL 목록에 대해 순차적으로 확인
-	    for (String acceptedUrl : acceptedUrls) {	       	  
-	        if (requestURI.equals(acceptedUrl)) {
-	            isAcceptedUrl = true; 
-	            break;  
-	        }
-	    }
+       // 2. 허용된 URL일 경우 JWT 토큰 검증을 건너뛰기
+       String requestURI = ((HttpServletRequest) request).getRequestURI();      
+       List<String> acceptedUrls = ACCEPTED_URL_LIST;
 
 
-	    if (!isAcceptedUrl) {  // 허용된 URL이 아닐 경우에만 토큰 검증
-	        if (token == null) {
-	            throw new JwtException("토큰이 빈 값입니다.");
-	        }
+       boolean isAcceptedUrl = false; 
 
-	        // JWT 토큰 검증
-	        if (jwtTokenProvider.validateToken(token)) {
-	            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-	            // SecurityContext에 인증 정보 저장
-	            SecurityContextHolder.getContext().setAuthentication(authentication);
-	        } else {
-	            throw new JwtException("유효하지 않은 토큰입니다.");
-	        }
-	    }
-
-	    // 3. 필터 체인 진행
-	    chain.doFilter(request, response);
-	}
+       // 허용된 URL 목록에 대해 순차적으로 확인
+       for (String acceptedUrl : acceptedUrls) {               
+           if (pathMatcher.match(acceptedUrl, requestURI)) {
+               isAcceptedUrl = true; 
+               break;  
+           }
+       }
 
 
-	// Request Header에서 토큰 정보 추출
-	private String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
-			return bearerToken.substring(7);
-		}
-		return null;
-	}
+       if (!isAcceptedUrl) {  // 허용된 URL이 아닐 경우에만 토큰 검증
+           if (token == null) {
+               throw new JwtException("토큰이 빈 값입니다.");
+           }
+
+           // JWT 토큰 검증
+           if (jwtTokenProvider.validateToken(token)) {
+               Authentication authentication = jwtTokenProvider.getAuthentication(token);
+               // SecurityContext에 인증 정보 저장
+               SecurityContextHolder.getContext().setAuthentication(authentication);
+           } else {
+               throw new JwtException("유효하지 않은 토큰입니다.");
+           }
+       }
+
+       // 3. 필터 체인 진행
+       chain.doFilter(request, response);
+   }
 
 
+   // Request Header에서 토큰 정보 추출
+   private String resolveToken(HttpServletRequest request) {
+      String bearerToken = request.getHeader("Authorization");
+      if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")) {
+         return bearerToken.substring(7);
+      }
+      return null;
+   }
 }
