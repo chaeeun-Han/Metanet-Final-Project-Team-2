@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @RestController
-@RequestMapping("/lecture")
+@RequestMapping("/lectures")
 public class LectureRestController {
 
     @Autowired
