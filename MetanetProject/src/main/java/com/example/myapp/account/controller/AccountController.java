@@ -114,7 +114,7 @@ public class AccountController {
 
                 // 매출 데이터를 List<MonthlySalesDto> 형식으로 변환
                 List<MonthlySalesDto> monthlySales = monthlyRevenueMap.entrySet().stream()
-                        .map(entry -> new MonthlySalesDto(entry.getKey(), String.valueOf(entry.getValue())))
+                        .map(entry -> new MonthlySalesDto(entry.getKey(), entry.getValue()))
                         .sorted(Comparator.comparing(MonthlySalesDto::getMonth).reversed()) // 최신순 정렬
                         .collect(Collectors.toList());
 

@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MonthlySalesDto {
 	private final String month;
-	private final String totalRevenue;
+	private final int totalRevenue;
 }
