@@ -61,6 +61,20 @@
 			FROM members
 		]]>
 	</select>
+
+	<select id="getMembersByLecture" parameterType="Long" resultType="com.example.myapp.excel.model.MemberForExcel">
+		<![CDATA[
+			SELECT 
+				k.title,
+			    CONCAT(LEFT(l.phone, 4), '****', RIGHT(l.phone, 5)) AS phone, 
+			    l.email, 
+			    l.name
+			FROM members l
+			LEFT JOIN attends m ON m.member_id = l.member_id
+			LEFT JOIN lectures k ON m.lecture_id = k.lecture_id
+			WHERE m.lecture_id = #{lectureId};
+		]]>
+	</select>
 	
 	<delete id="forceDeleteMember">
 		<![CDATA[
