@@ -29,17 +29,20 @@ private final JwtTokenProvider jwtTokenProvider;
    private final AntPathMatcher pathMatcher = new AntPathMatcher();
    public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
            "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",
-           "/ws/**");
+           "/ws/**", "lectures/all");
 
    @Override
    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
            throws IOException, ServletException {
+	   HttpServletRequest httpRequest = (HttpServletRequest) request;
+	   
        // 1. Request Header에서 JWT 토큰 추출
-       String token = resolveToken((HttpServletRequest) request);
+       String token = resolveToken(httpRequest);
 
        // 2. 허용된 URL일 경우 JWT 토큰 검증을 건너뛰기
-       String requestURI = ((HttpServletRequest) request).getRequestURI();      
+       String requestURI = httpRequest.getRequestURI();      
        List<String> acceptedUrls = ACCEPTED_URL_LIST;
+       String method = httpRequest.getMethod();
 
 
        boolean isAcceptedUrl = false; 
@@ -51,7 +54,15 @@ private final JwtTokenProvider jwtTokenProvider;
                break;  
            }
        }
-
+       
+       if (!isAcceptedUrl && "GET".equalsIgnoreCase(method)) {
+           if (pathMatcher.match("lectures/**", requestURI) ||  // 전체 lectures 경로 허용
+               pathMatcher.match("lectures/**/reviews", requestURI) ||
+               pathMatcher.match("/lectures/*/questions", requestURI) ||
+               pathMatcher.match("/lectures/*/questions/*", requestURI)) {
+               isAcceptedUrl = true;
+           }
+       }
 
        if (!isAcceptedUrl) {  // 허용된 URL이 아닐 경우에만 토큰 검증
            if (token == null) {
