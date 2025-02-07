@@ -3,6 +3,8 @@ package com.example.myapp.common.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -32,7 +34,7 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         return ResponseEntity.ok(responseBody);
 
-    }
+    }    
 
     // HTTP Status 400
     public static ResponseEntity<ResponseDto> notExistUser() {
@@ -132,4 +134,14 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.DENY_REFUND, ResponseMessage.DENY_REFUND);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
+    
+    public static ResponseEntity<byte[]> successPdf(byte[] pdfContent) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/pdf");
+        headers.add("Content-Disposition", "attachment; filename=certificate.pdf");
+
+        // PDF 콘텐츠를 body로 직접 반환
+        return ResponseEntity.ok().headers(headers).body(pdfContent);
+    }
+
 }
