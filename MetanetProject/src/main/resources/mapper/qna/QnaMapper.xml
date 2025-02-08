@@ -107,4 +107,10 @@
 		SET deleted = 1
 		WHERE answer_id = #{answerId}
 	</update>
+	
+	<select id="getQuestionTitle" parameterType="long">
+		SELECT title AS title
+		FROM questions
+		WHERE question_id = #{questionId}
+	</select>
 </mapper>

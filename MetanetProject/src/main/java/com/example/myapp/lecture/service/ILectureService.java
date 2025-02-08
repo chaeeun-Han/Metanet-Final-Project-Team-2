@@ -6,6 +6,7 @@ import java.util.Map;
 import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
+import com.example.myapp.lecture.model.LectureList;
 
 public interface ILectureService {
     Map<String, List<Lecture>> getAllLectures();
@@ -51,4 +52,6 @@ public interface ILectureService {
     void payRefund(Map<String, Long> params);
 
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
+
+    void insertLectureListByExcel(LectureList lectureList);
 }

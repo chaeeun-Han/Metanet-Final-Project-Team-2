@@ -13,6 +13,7 @@ import com.example.myapp.lecture.dao.ILectureRepository;
 import com.example.myapp.lecture.model.Lecture;
 import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
+import com.example.myapp.lecture.model.LectureList;
 
 @Service
 public class LectureService implements ILectureService {
@@ -164,6 +165,11 @@ public class LectureService implements ILectureService {
     @Override
     public void payRefund(Map<String, Long> params) {
         lectureDao.payRefund(params);
+    }
+
+    @Override
+    public void insertLectureListByExcel(LectureList lectureList) {
+        lectureDao.insertLectureListByExcel(lectureList);
     }
 
 }
