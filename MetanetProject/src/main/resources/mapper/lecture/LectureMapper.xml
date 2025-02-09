@@ -9,6 +9,7 @@
         SELECT 
             l.lecture_id AS lectureId,
             l.member_id AS memberId,
+            m.name AS teacher,
             l.title,
             l.profile,
             l.description,
@@ -28,12 +29,12 @@
             (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
             (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
         FROM lectures l
+        LEFT JOIN members m ON l.member_id = m.member_id
         LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
         ORDER BY l.lectures_date DESC;
-
 	]]>
 	</select>
 
@@ -42,6 +43,7 @@
         SELECT 
             l.lecture_id AS lectureId,
             l.member_id AS memberId,
+            m.name AS teacher,
             l.title,
             l.profile,
             l.description,
@@ -61,6 +63,7 @@
             (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
             (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
         FROM lectures l
+        LEFT JOIN members m ON l.member_id = m.member_id
         LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
@@ -75,6 +78,7 @@
         SELECT 
             l.lecture_id AS lectureId,
             l.member_id AS memberId,
+            m.name AS teacher,
             l.title,
             l.profile,
             l.description,
@@ -94,13 +98,13 @@
             (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
             (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
         FROM lectures l
+        LEFT JOIN members m ON l.member_id = m.member_id
         LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
         ORDER BY l.likes ASC
         LIMIT 5;
-
     ]]>
     </select>
 	<select id="checkLikeLectures" parameterType="map" resultType="Boolean">
@@ -218,32 +222,34 @@
     <select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
         <![CDATA[
             SELECT 
-                l.lecture_id AS lectureId,
-                l.member_id AS memberId,
-                l.title,
-                l.profile,
-                l.description,
-                l.description_pic AS descriptionPic,
-                l.category,
-                l.price,
-                l.status,
-                l.link,
-                l.likes,
-                l.limit_student AS limitStudent,
-                l.deadline_time AS deadlineTime,
-                l.lectures_date AS lecturesDate,
-                l.start_date AS startDate,
-                l.end_date AS endDate,
-                l.deleted,
-                GROUP_CONCAT(t.tag_name ORDER BY t.tag_name SEPARATOR ', ') AS tags,
-                (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
-                (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
-            FROM lectures l
-            LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
-            LEFT JOIN tags t ON lt.tag_id = t.tag_id
-            WHERE l.deleted = 0 AND l.lecture_id = #{lectureId}
-            GROUP BY l.lecture_id
-            ORDER BY l.lectures_date DESC;
+            l.lecture_id AS lectureId,
+            l.member_id AS memberId,
+            m.name AS teacher,
+            l.title,
+            l.profile,
+            l.description,
+            l.description_pic AS descriptionPic,
+            l.category,
+            l.price,
+            l.status,
+            l.link,
+            l.likes,
+            l.limit_student AS limitStudent,
+            l.deadline_time AS deadlineTime,
+            l.lectures_date AS lecturesDate,
+            l.start_date AS startDate,
+            l.end_date AS endDate,
+            l.deleted,
+            GROUP_CONCAT(t.tag_name ORDER BY t.tag_name SEPARATOR ', ') AS tags,
+            (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id) AS enrolledStudents,
+            (l.limit_student - (SELECT COUNT(a.member_id) FROM attends a WHERE a.lecture_id = l.lecture_id)) AS leftSpace
+        FROM lectures l
+        LEFT JOIN members m ON l.member_id = m.member_id
+        LEFT JOIN lectures_tags lt ON l.lecture_id = lt.lecture_id
+        LEFT JOIN tags t ON lt.tag_id = t.tag_id
+        WHERE l.deleted = 0 AND l.lecture_id = #{lecture_id}
+        GROUP BY l.lecture_id
+        ORDER BY l.lectures_date DESC;
         ]]>
     </select>
 
