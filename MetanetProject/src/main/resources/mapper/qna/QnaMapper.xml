@@ -64,7 +64,7 @@
 		SELECT a.answer_id AS answerId, a.content AS content, reply_date AS date,
 			m.profile AS profile, m.id AS writerId
 		FROM answers a JOIN members m ON a.member_id = m.member_id
-		WHERE a.question_id = #{questionId}
+		WHERE a.question_id = #{questionId} and a.deleted = 0
 		ORDER BY a.reply_date
 	</select>
 	
