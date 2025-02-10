@@ -43,4 +43,7 @@ public interface IMemberRepository {
 	String getIdByMemberId(Long memberId);
 
 	List<MemberForExcel> getMembersByLecture(Long lectureId);
+	
+	String getAttendIdById(Long memberUID);
+	
 }

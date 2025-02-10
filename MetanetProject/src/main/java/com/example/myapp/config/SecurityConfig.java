@@ -57,6 +57,9 @@ public class SecurityConfig {
 				.requestMatchers("/ws/**").permitAll()
 	            .requestMatchers("/user/**").permitAll()
 	            .requestMatchers("/topic/**", "/queue/**").permitAll()
+	            .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
+	            .requestMatchers("/zoom/*").permitAll()
+	            .requestMatchers("/error", "/favicon.ico").permitAll()
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요
 		);
 

@@ -354,8 +354,8 @@
 		        SEPARATOR '\n'
 		    ) AS schedule
 		FROM lecture_lists ll
-		JOIN lectures l ON ll.lecture_id = l.lecture_id
-		JOIN members m ON ll.member_id = m.member_id
+		JOIN attends a ON ll.lecture_id = a.lecture_id
+		JOIN members m ON a.member_id = m.member_id
 		WHERE DATE(ll.start_time) = CURDATE()
 		GROUP BY m.email;
 	]]>	
@@ -367,7 +367,10 @@
 		    m.email, 
 		    l.title AS title,
 		    DATE_FORMAT(ll.start_time, '%Y년 %c월 %e일 %p %l시 %i분') AS startTime,
-		    l.link AS link
+		    ll.link AS link,
+		    m.attend_id AS attendId,
+		    ll.meeting_id AS meetingId,
+		    ll.member_id AS teacherId
 		FROM attends a
 		JOIN members m ON a.member_id = m.member_id
 		JOIN lectures l ON a.lecture_id = l.lecture_id
@@ -385,5 +388,24 @@
             (#{lecture_id}, #{member_id}, #{title}, #{description}, #{start_time}, #{end_time})
     ]]>
     </insert>
+	
+	<update id="updateMeetingInfo">
+	    UPDATE lecture_lists
+	    SET 
+	        meeting_id = CASE 
+	            <foreach collection="list" item="response">
+	                WHEN lecture_list_id = #{response.lectureListId} THEN #{response.meetingId}
+	            </foreach>
+	        END,
+	        link = CASE
+	            <foreach collection="list" item="response">
+	                WHEN lecture_list_id = #{response.lectureListId} THEN #{response.link}
+	            </foreach>
+	        END
+	    WHERE lecture_list_id IN 
+	    <foreach collection="list" item="response" open="(" separator="," close=")">
+	        #{response.lectureListId}
+	    </foreach>
+	</update>
 	
 </mapper>

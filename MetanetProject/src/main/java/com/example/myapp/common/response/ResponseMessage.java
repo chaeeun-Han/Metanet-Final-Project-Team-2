@@ -12,6 +12,7 @@ public interface ResponseMessage {
     String VALIDATION_FAILED = "validation failed";
     String NOT_SAME_PW = "not same password and password1";
     String NULL_INTPUT_VALUE = "null input value";
+    String ZOOM_BAD_REQUEST = "Zoom bad request";
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "Login information mismatch.";
@@ -22,6 +23,12 @@ public interface ResponseMessage {
 
     // HTTP Status 403
     String NO_PERMISSION = "Do not have permission.";
+    
+    //HTTP Status 404
+    String ZOOM_NOT_FOUND = "Not found user";
+    
+    //HTTP Status 429
+    String ZOOM_TOO_MANY_REQUESTS = "Too many requests";
 
     // HTTP Status 500
     String MAIL_FAIL = "mail send failed";

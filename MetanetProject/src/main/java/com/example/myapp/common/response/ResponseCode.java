@@ -12,6 +12,7 @@ public interface ResponseCode {
     String VALIDATION_FAILED = "VF";
     String NOT_SAME_PW = "NSP";
     String NULL_INTPUT_VALUE = "NIV";
+    String ZOOM_BAD_REQUEST = "ZBR";
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "SF";
@@ -22,6 +23,12 @@ public interface ResponseCode {
 
     // HTTP Status 403
     String NO_PERMISSION = "NP";
+    
+    //HTTP Status 404
+    String ZOOM_NOT_FOUND = "ZNF";
+    
+    //HTTP Status 429
+    String ZOOM_TOO_MANY_REQUESTS = "ZTMR";
 
     // HTTP Status 500
     String MAIL_FAIL = "MF";

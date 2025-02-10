@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.myapp.lecture.model.Lecture;
@@ -11,8 +12,9 @@ import com.example.myapp.lecture.model.LectureFile;
 import com.example.myapp.lecture.model.LectureId;
 import com.example.myapp.lecture.model.LectureList;
 import com.example.myapp.lecture.model.LectureReminderDto;
-import com.example.myapp.lecture.model.LectureScheduled;
 import com.example.myapp.lecture.model.LectureRevenueDto;
+import com.example.myapp.lecture.model.LectureScheduled;
+import com.example.myapp.zoom.model.ZoomMeetingResponse;
 
 @Repository
 @Mapper
@@ -76,4 +78,6 @@ public interface ILectureRepository {
     List<LectureReminderDto> getLecturesStartingIn30Minutes();
 
     void insertLectureListByExcel(LectureList lectureList);
+    
+    void updateMeetingInfo(@Param("list") List<ZoomMeetingResponse> responses);
 }
