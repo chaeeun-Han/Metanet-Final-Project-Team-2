@@ -63,7 +63,7 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
-    // 특정 강의의 조회 -- 고범준
+    // 특정 강의 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @GetMapping("/{lecture_id}")
     public ResponseEntity<ResponseDto> getLectureDetail(@PathVariable("lecture_id") Long lectureId) {
