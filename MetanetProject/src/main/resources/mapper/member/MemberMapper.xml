@@ -90,10 +90,16 @@
         	WHERE role <> 'admin'
 		]]>
 	</delete>
-
+	
 	<select id="getIdByMemberId" resultType="string">
 		SELECT id
 		FROM members
-		WHERE member_id = #{memberId}
+		WHERE member_id = #{memberUID}
+	</select>
+	
+	<select id="getAttendIdById" resultType="string">
+		SELECT attend_id AS attendId
+		FROM members
+		WHERE member_id = #{memberUID}
 	</select>
 </mapper>
