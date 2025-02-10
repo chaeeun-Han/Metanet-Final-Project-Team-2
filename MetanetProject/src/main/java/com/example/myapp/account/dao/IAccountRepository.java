@@ -1,7 +1,5 @@
 package com.example.myapp.account.dao;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -9,9 +7,12 @@ import org.springframework.boot.json.JsonWriter.Members;
 import org.springframework.stereotype.Repository;
 
 import com.example.myapp.account.model.AccountLecture;
-import com.example.myapp.account.model.AttendLecture;
 import com.example.myapp.account.model.DueToLecture;
+import com.example.myapp.account.model.EndLecture;
 import com.example.myapp.account.model.IngLecture;
+import com.example.myapp.account.model.MyStudy;
+import com.example.myapp.account.model.MyStudyLectureList;
+import com.example.myapp.account.model.Pay;
 
 @Repository
 @Mapper
@@ -24,37 +25,18 @@ public interface IAccountRepository {
 
 	List<Members> getMyPage(Long memberUID);
 
-	List<AttendLecture> getAttendLecture(String memberUID);
+	List<Pay> getPaylog(Long memberUID);
 
-	List<AttendLecture> getProgressLecture(String memberUID);	
+	double getAttendPercent(Long memberUID);
 
-	List<String> getLectureIdById(String memberUID);
-	
-	String getLectureTitleById(String lectureId);
+	List<MyStudy> getMyStudy(Long memberUID);
 
-	int getAllLectureCount(String lectureId);
+	List<MyStudyLectureList> getMyStudyLectureList(Long lecture_id, Long memberUID);
 
-	List<String> getLectureListId(String lectureId);
+	List<DueToLecture> getDueToLectures(Long teacherId);
 
-	int getCountAttendLecture(String lecture_list_id, String memberUID);
+	List<IngLecture> getIngLectures(Long teacherId);
 
-	String getLectureDetailTile(String lecture_list_id);
+	List<EndLecture> getEndLectures(Long teacherId);
 
-	int getAllAttendTime(String lecture_list_id);
-
-	Integer getPlayTime(String lecture_list_id, String memberUID);
-
-	List<DueToLecture> getDueToLecture(String memberUID, String formattedNow);
-
-	List<IngLecture> getIngLectures(double attendPercent, String memberUID, String formattedNow, String lectureListId);
-	
-	List<String> getLectureListIdFalse(String lectureId);
-
-	int getAllStudent(String lecutre_list_id);
-
-	int getNoAttendStudent(String lecutre_list_id);
-
-	List<String> getLectureIdByTeacherId(String memberUID);
-
-	List<String> getLectureListIdTrue(String lecture_id);
 }

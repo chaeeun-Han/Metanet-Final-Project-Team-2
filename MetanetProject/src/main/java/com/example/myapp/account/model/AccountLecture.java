@@ -8,10 +8,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class AccountLecture {
-	
+	//lectures의 category
 	private String category;
+	//lectures의 title
 	private String title;
+	//lectures의 profile
 	private String profile;	
-	//lectures의 강의 종료일 추가해야함
-	//attends의 수료가능여부 추가해야함
+	//lectures의 finished
+	private boolean finished;	
+	//attends의 finished
+	private boolean is_coursable;
 }

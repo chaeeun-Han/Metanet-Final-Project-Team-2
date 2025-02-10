@@ -185,42 +185,43 @@ public class AccountController {
 		return accountService.getMyPage(user);
 	}
 	
+	//구매 내역 조회
+	@GetMapping("/pay-log")
+	public ResponseEntity<ResponseDto> getPaylog(){	
+		
+		String user = GetAuthenUser.getAuthenUser();
+		
+		if (user == null) {
+			return ResponseDto.noAuthentication();
+		}
+						
+		return accountService.getPaylog(user);
+	}
 	
-	//대시보드 조회 - 내학습률 -모두
-//	@GetMapping("/myTech")
-//	public ResponseEntity<ResponseDto> getMytech(){
-//		
-//		String user = GetAuthenUser.getAuthenUser();
-//		
-//		if (user == null) {
-//			return ResponseDto.noAuthentication();
-//		}
-//		
-//		
-//		return accountService.getMyTech(user);
-//	}
-//	
-//	
-//	
-//	//대시보드 조회 - 강의 -Teacher, Admin
-//	@GetMapping("/lecture-dashboard")
-//	public ResponseEntity<ResponseDto> getLectureDashBoard(){
-//		
-//		String user = GetAuthenUser.getAuthenUser();
-//		
-//		if (user == null) {
-//			return ResponseDto.noAuthentication();
-//		}
-//		
-//		
-//		return accountService.getLectureDashBoard(user);
-//	}
+		
+	//내학습률 대시보드
+	@GetMapping("/my-study")
+	public ResponseEntity<ResponseDto> getMyStudy(){
+		String user = GetAuthenUser.getAuthenUser();
+		
+		if (user == null) {
+			return ResponseDto.noAuthentication();
+		}
+		
+		return accountService.getMyStudy(user);		
+	}
 	
-	
-	
-	//결제 내역 조회 - 모두 
-	 
-	
+	//강의에 대한 대시보드
+	@GetMapping("/teacher-lecture")
+	public ResponseEntity<ResponseDto> getTeacherLecture(){
+		String user = GetAuthenUser.getAuthenUser();
+		
+		if (user == null) {
+			return ResponseDto.noAuthentication();
+		}
+		
+		return accountService.getMyLecture(user);		
+	}
 	
 	
 	
