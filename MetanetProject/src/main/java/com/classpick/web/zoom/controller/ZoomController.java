@@ -103,7 +103,7 @@ public class ZoomController {
         return response;
     }
     
-    @PostMapping("/zoom")
+    @PostMapping("/webhook")
     public ResponseEntity<ResponseDto> handleZoomWebhook(@RequestBody Map<String, Object> payload) {
         log.info("📩 Zoom Webhook Received: {}", payload);
 
