@@ -14,6 +14,7 @@ import lombok.ToString;
 public class Lecture {
     private Long lectureId;
     private Long memberId;
+    private String teacher;
     private String title;
     private String profile;
     private String profileUrl;

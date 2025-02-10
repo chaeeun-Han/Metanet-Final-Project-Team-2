@@ -1,5 +1,6 @@
 package com.example.myapp.member.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -19,12 +20,14 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import com.example.myapp.common.response.ResponseCode;
 import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.common.response.ResponseMessage;
+import com.example.myapp.excel.model.MemberForExcel;
 import com.example.myapp.jwt.JwtTokenProvider;
 import com.example.myapp.jwt.model.JwtToken;
 import com.example.myapp.jwt.model.RefreshToken;
 import com.example.myapp.jwt.service.RedisTokenService;
 import com.example.myapp.member.dao.IMemberRepository;
 import com.example.myapp.member.model.Member;
+import com.example.myapp.member.model.MemberResponse;
 import com.example.myapp.util.RedisUtil;
 
 import jakarta.mail.MessagingException;
@@ -85,7 +88,7 @@ public class MemberService implements IMemberService {
 			context.setVariable("lectures", data);
 		} else if ("member/mail".equals(templateName)) {
 			context.setVariable("code", data);
-		} 
+		}
 
 		templateResolver.setPrefix("templates/");
 		templateResolver.setSuffix(".html");
@@ -121,7 +124,7 @@ public class MemberService implements IMemberService {
 			templateName = "member/mail";
 			String authCode = createCode();
 			templateData = authCode;
-			
+
 			// 인증 코드 Redis 저장
 			if (data instanceof String) {
 				redisUtil.setDataExpire(email, (String) authCode, 60 * 30L);
@@ -131,7 +134,7 @@ public class MemberService implements IMemberService {
 			subject = "[Metanet] 강의 일정 안내";
 			templateName = "lecture/lecture_schedule_mail";
 			templateData = data;
-			
+
 		} else if ("lecture_reminder".equals(type)) {
 			subject = "[Metanet] 강의 30분 전 안내 및 zoom 링크 제공";
 			templateName = "lecture/lecture_reminder";
@@ -152,12 +155,12 @@ public class MemberService implements IMemberService {
 	}
 
 	@Override
-	public ResponseEntity<ResponseDto> sendEmail(String type, String email, Object data) throws MessagingException{
+	public ResponseEntity<ResponseDto> sendEmail(String type, String email, Object data) throws MessagingException {
 		try {
 			if (redisUtil.existData(email)) {
 				redisUtil.deleteData(email);
 			}
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseDto.redisError();
 		}
@@ -171,7 +174,6 @@ public class MemberService implements IMemberService {
 		}
 		return ResponseEntity.ok(new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
 	}
-
 
 	@Override
 	public ResponseEntity<ResponseDto> verifyEmailCode(String email, String code) {
@@ -309,16 +311,21 @@ public class MemberService implements IMemberService {
 	@Override
 	public ResponseEntity<ResponseDto> resetEmail(String user, String email) {
 		Long memberUID = memberRepository.getMemberIdById(user);
-		
+
 		try {
 			memberRepository.resetEmail(email, memberUID);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-	        return ResponseDto.databaseError();
+			return ResponseDto.databaseError();
 		}
-		
+
 		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
 		return ResponseEntity.ok(responseBody);
 
+	}
+
+	@Override
+	public List<MemberForExcel> getMembersByLecture(Long lectureId) {
+		return memberRepository.getMembersByLecture(lectureId);
 	}
 }

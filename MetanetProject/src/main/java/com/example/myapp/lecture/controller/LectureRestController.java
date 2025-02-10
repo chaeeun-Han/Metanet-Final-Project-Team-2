@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @RestController
-@RequestMapping("/lecture")
+@RequestMapping("/lectures")
 public class LectureRestController {
 
     @Autowired
@@ -80,7 +80,7 @@ public class LectureRestController {
 
     // 좋아요 누른 강의 목록 보기 -- 고범준
     @SuppressWarnings({ "rawtypes" })
-    @PostMapping("/like/{lecture_id}")
+    @PostMapping("/likes/{lecture_id}")
     public ResponseEntity<ResponseDto> likeLectures(@PathVariable("lecture_id") Long lectureId) {
 
     	String member_id =  GetAuthenUser.getAuthenUser();
