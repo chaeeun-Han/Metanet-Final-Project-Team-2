@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.myapp.lecture.dao.ILectureRepository">
+<mapper namespace="com.classpick.web.lecture.dao.ILectureRepository">
 
-	<select id="getAllLectures" resultType="com.example.myapp.lecture.model.Lecture">
+	<select id="getAllLectures" resultType="com.classpick.web.lecture.model.Lecture">
 	<![CDATA[
         SELECT 
             l.lecture_id AS lectureId,
@@ -17,7 +17,6 @@
             l.category,
             l.price,
             l.status,
-            l.link,
             l.likes,
             l.limit_student AS limitStudent,
             l.deadline_time AS deadlineTime,
@@ -38,7 +37,7 @@
 	]]>
 	</select>
 
-    <select id="getRankByDeadDateLectures" resultType="com.example.myapp.lecture.model.Lecture">
+    <select id="getRankByDeadDateLectures" resultType="com.classpick.web.lecture.model.Lecture">
 	<![CDATA[
         SELECT 
             l.lecture_id AS lectureId,
@@ -51,7 +50,6 @@
             l.category,
             l.price,
             l.status,
-            l.link,
             l.likes,
             l.limit_student AS limitStudent,
             l.deadline_time AS deadlineTime,
@@ -73,7 +71,7 @@
 	]]>
 	</select>
 
-    <select id="getRankByLikeLectures" resultType="com.example.myapp.lecture.model.Lecture">
+    <select id="getRankByLikeLectures" resultType="com.classpick.web.lecture.model.Lecture">
     <![CDATA[
         SELECT 
             l.lecture_id AS lectureId,
@@ -86,7 +84,6 @@
             l.category,
             l.price,
             l.status,
-            l.link,
             l.likes,
             l.limit_student AS limitStudent,
             l.deadline_time AS deadlineTime,
@@ -132,14 +129,14 @@
     ]]>
 	</delete>
 
-	<insert id="lectureFileUpload" parameterType="com.example.myapp.lecture.model.LectureFile">
+	<insert id="lectureFileUpload" parameterType="com.classpick.web.lecture.model.LectureFile">
 	<![CDATA[
         INSERT INTO lecture_files (lecture_id, member_id, file_url)
         VALUES (#{lectureId}, #{memberId}, #{fileUrl})
     ]]>
 	</insert>
 
-	<update id="setRefundStatus" parameterType="com.example.myapp.lecture.model.LectureFile">
+	<update id="setRefundStatus" parameterType="com.classpick.web.lecture.model.LectureFile">
 	<![CDATA[
         UPDATE attends
         SET is_refundable = false
@@ -148,7 +145,7 @@
 	</update>
 
 
-	<insert id="registerLectures" parameterType="com.example.myapp.lecture.model.Lecture" useGeneratedKeys="true" keyProperty="lectureId">
+	<insert id="registerLectures" parameterType="com.classpick.web.lecture.model.Lecture" useGeneratedKeys="true" keyProperty="lectureId">
 	<![CDATA[
 		INSERT INTO lectures (
             member_id, title, profile, description, description_pic, category, 
@@ -160,7 +157,7 @@
 	]]>
 	</insert>
 
-<update id="updateLectures" parameterType="com.example.myapp.lecture.model.Lecture">
+<update id="updateLectures" parameterType="com.classpick.web.lecture.model.Lecture">
         UPDATE lectures
     <set>
         <if test="title != null"> title = #{title}, </if>
@@ -219,7 +216,7 @@
     ]]>
     </delete>
 
-    <select id="getLectureDetail" parameterType="Long" resultType="com.example.myapp.lecture.model.Lecture">
+    <select id="getLectureDetail" parameterType="Long" resultType="com.classpick.web.lecture.model.Lecture">
         <![CDATA[
             SELECT 
             l.lecture_id AS lectureId,
@@ -232,7 +229,6 @@
             l.category,
             l.price,
             l.status,
-            l.link,
             l.likes,
             l.limit_student AS limitStudent,
             l.deadline_time AS deadlineTime,
@@ -271,7 +267,7 @@
 	]]>
 	</delete>
 
-    <select id="getLectureFiles" parameterType="Long" resultType="com.example.myapp.lecture.model.LectureFile">
+    <select id="getLectureFiles" parameterType="Long" resultType="com.classpick.web.lecture.model.LectureFile">
     <![CDATA[
         SELECT file_url as fileUrl FROM lecture_files WHERE lecture_id = #{lectureId}
     ]]>
@@ -313,7 +309,7 @@
     ]]>
     </select>
     
-	<select id="getSalesForMember" resultType="com.example.myapp.lecture.model.LectureRevenueDto">
+	<select id="getSalesForMember" resultType="com.classpick.web.lecture.model.LectureRevenueDto">
     <![CDATA[
 		SELECT 
 		    DATE_FORMAT(l.start_date, '%Y-%m') AS month, 
@@ -343,7 +339,7 @@
     </insert>
     
 	
-	<select id="findTodayLectures" resultType="com.example.myapp.lecture.model.LectureScheduled">
+	<select id="findTodayLectures" resultType="com.classpick.web.lecture.model.LectureScheduled">
 	<![CDATA[
 		SELECT
 		    m.email,
@@ -361,7 +357,7 @@
 	]]>	
 	</select>
 	
-	<select id="getLecturesStartingIn30Minutes" resultType="com.example.myapp.lecture.model.LectureReminderDto">
+	<select id="getLecturesStartingIn30Minutes" resultType="com.classpick.web.lecture.model.LectureReminderDto">
 	<![CDATA[
 		SELECT 
 		    m.email, 
@@ -379,7 +375,7 @@
 	]]>	
 	</select>
 
-    <insert id="insertLectureListByExcel" parameterType="com.example.myapp.lecture.model.LectureList">
+    <insert id="insertLectureListByExcel" parameterType="com.classpick.web.lecture.model.LectureList">
     <![CDATA[
         INSERT
             INTO lecture_lists

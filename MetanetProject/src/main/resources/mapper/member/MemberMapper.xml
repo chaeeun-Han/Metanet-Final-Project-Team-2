@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.myapp.member.dao.IMemberRepository">
+<mapper namespace="com.classpick.web.member.dao.IMemberRepository">
 
-	<insert id="insertMember" parameterType="com.example.myapp.member.model.Member">
+	<insert id="insertMember" parameterType="com.classpick.web.member.model.Member">
 		<![CDATA[
 			INSERT INTO 
 				members id, name, password, phone, email, role, deleted, birth, profile, bank, attend_id as attendId 
@@ -13,7 +13,7 @@
 		]]>
 	</insert>
 
-	<select id="findById" resultType="com.example.myapp.member.model.Member">
+	<select id="findById" resultType="com.classpick.web.member.model.Member">
 		SELECT * FROM members WHERE id = #{id}
 	</select>
 	
@@ -55,14 +55,14 @@
 		WHERE member_id = #{memberUID}  
 	</update>
 
-	<select id="getAllMembers" resultType="com.example.myapp.member.model.MemberResponse">
+	<select id="getAllMembers" resultType="com.classpick.web.member.model.MemberResponse">
 		<![CDATA[
 			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
 			FROM members
 		]]>
 	</select>
 
-	<select id="getMembersByLecture" parameterType="Long" resultType="com.example.myapp.excel.model.MemberForExcel">
+	<select id="getMembersByLecture" parameterType="Long" resultType="com.classpick.web.excel.model.MemberForExcel">
 		<![CDATA[
 			SELECT 
 				k.title,

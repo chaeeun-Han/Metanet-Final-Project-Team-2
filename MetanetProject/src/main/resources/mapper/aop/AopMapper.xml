@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.myapp.aop.IAopRepository">
+<mapper namespace="com.classpick.web.aop.IAopRepository">
 
-	<insert id="insertLog" parameterType="com.example.myapp.aop.Log">
+	<insert id="insertLog" parameterType="com.classpick.web.aop.Log">
 		INSERT INTO logs (
 			request_url,
             request_method,
@@ -24,7 +24,7 @@
 		)
 	</insert>
 	
-	<select id="getLogById" parameterType="long" resultType="com.example.myapp.aop.Log">
+	<select id="getLogById" parameterType="long" resultType="com.classpick.web.aop.Log">
 		SELECT
 			log_id AS logId,
             request_url AS requestUrl,
@@ -38,7 +38,7 @@
         WHERE log_id = #{logId}
 	</select>
 	
-	<select id="getAllLogs" resultType="com.example.myapp.aop.Log">
+	<select id="getAllLogs" resultType="com.classpick.web.aop.Log">
 		SELECT 
             log_id AS logId,
             request_url AS requestUrl,

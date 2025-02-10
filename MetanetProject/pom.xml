@@ -9,8 +9,8 @@
 		<version>3.4.1</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>board</artifactId>
+	<groupId>com.classpick</groupId>
+	<artifactId>classpick</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>board</name>
@@ -214,6 +214,14 @@
 			<artifactId>itext-asian</artifactId>
 			<version>5.2.0</version>
 		</dependency>
+		
+		<!-- JUnit 5 -->
+	    <dependency>
+	        <groupId>org.junit.jupiter</groupId>
+	        <artifactId>junit-jupiter-api</artifactId>
+	        <version>5.9.3</version>
+	        <scope>test</scope>
+    	</dependency>
 
 
 	</dependencies>
@@ -224,6 +232,48 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+	            <groupId>org.jacoco</groupId>
+	            <artifactId>jacoco-maven-plugin</artifactId>
+	            <version>0.8.10</version>
+	            <executions>
+	                <execution>
+	                    <id>prepare-agent</id>
+	                    <goals>
+	                        <goal>prepare-agent</goal>
+	                    </goals>
+	                </execution>
+	                <execution>
+	                    <id>report</id>
+	                    <phase>verify</phase>
+	                    <goals>
+	                        <goal>report</goal>
+	                    </goals>
+	                </execution>
+	                <execution>
+	                    <id>check</id>
+	                    <phase>verify</phase>
+	                    <goals>
+	                        <goal>check</goal>
+	                    </goals>
+	                    <configuration>
+	                        <rules>
+	                            <rule>
+	                                <element>BUNDLE</element>
+	                                <limits>
+	                                    <limit>
+	                                        <counter>INSTRUCTION</counter>
+	                                        <value>COVEREDRATIO</value>
+	                                        <minimum>0.80</minimum> 
+	                                        <!-- 코드 커버리지가 80% 이상이어야 빌드 성공 -->
+	                                    </limit>
+	                                </limits>
+	                            </rule>
+	                        </rules>
+	                    </configuration>
+	                </execution>
+	            </executions>
+	        </plugin>
 		</plugins>
 	</build>
 
