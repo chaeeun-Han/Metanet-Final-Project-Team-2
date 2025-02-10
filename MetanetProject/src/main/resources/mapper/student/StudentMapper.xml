@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.myapp.zoom.dao.IZoomRepository">
+<mapper namespace="com.classpick.web.zoom.dao.IZoomRepository">
     <insert id="upsertStudentAttendance">
         INSERT INTO students (
             member_id, lecture_list_id, enter_time, play_time, out_time, is_attend
