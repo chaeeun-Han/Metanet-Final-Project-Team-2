@@ -13,9 +13,7 @@ public class AccountLecture {
 	//lectures의 title
 	private String title;
 	//lectures의 profile
-	private String profile;	
-	//lectures의 finished
-	private boolean finished;	
-	//attends의 finished
-	private boolean is_coursable;
+	private String profile;		
+	//attends의 is_coursable
+	private boolean isCoursable;
 }

@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Pay {
-	private Long pay_id;
+	private Long payId;
 	private boolean status;
 	private int price;
-	private String start_date;
-	private String end_date;
+	private String startDate;
+	private String endDate;
 }

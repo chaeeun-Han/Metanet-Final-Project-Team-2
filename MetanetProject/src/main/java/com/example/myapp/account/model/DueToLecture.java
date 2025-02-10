@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class DueToLecture {
 	private String title;
-	private String start_date;
-	private String end_date;
+	private String startDate;
+	private String endDate;
 }

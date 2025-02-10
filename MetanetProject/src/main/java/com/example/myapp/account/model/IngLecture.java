@@ -6,9 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class IngLecture {
-	private String lecture_list_title;
-	private String end_time;
-	private String start_time;
-	private double attend_percent;
-	private Long lecture_id;
+	private String lectureListId;
+	private String endTime;
+	private String startTime;
+	private double attendPercent;
+	private Long lectureId;
+	private String title;
 }

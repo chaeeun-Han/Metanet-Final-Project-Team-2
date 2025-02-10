@@ -148,7 +148,7 @@ public class AccountService implements IAccountService {
         // MyStudyLectureList를 조회하여 각 MyStudy 객체에 설정
         for (MyStudy myStudy : results) {
             // 각 MyStudy에 해당하는 강의 목록을 조회
-            List<MyStudyLectureList> lectureLists = accountRepository.getMyStudyLectureList(myStudy.getLecture_id(),
+            List<MyStudyLectureList> lectureLists = accountRepository.getMyStudyLectureList(myStudy.getLectureId(),
                     memberUID);
 
             // 데이터가 없을 경우 빈 리스트 반환
