@@ -30,7 +30,7 @@ public class Member implements UserDetails{
     private String role;
     private String bank;
     private int deleted;   
-    
+    private String attend_id;
     
     
    
