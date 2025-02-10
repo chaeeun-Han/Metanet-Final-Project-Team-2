@@ -71,6 +71,11 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.NULL_INTPUT_VALUE, ResponseMessage.NULL_INTPUT_VALUE);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
+    
+    public static ResponseEntity<ResponseDto> zoomBadRequest() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.ZOOM_BAD_REQUEST, ResponseMessage.ZOOM_BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
 
     // HTTP Status 401
     public static ResponseEntity<ResponseDto> signInFail() {
@@ -103,6 +108,18 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.NO_PERMISSION, ResponseMessage.NO_PERMISSION);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
     }
+    
+    // HTTP Status 404
+    public static ResponseEntity<ResponseDto> zoomNotFound() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.ZOOM_NOT_FOUND, ResponseMessage.ZOOM_NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
+    }
+    
+    // HTTP Status 429
+    public static ResponseEntity<ResponseDto> zoomTooManyRequests() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.ZOOM_TOO_MANY_REQUESTS, ResponseMessage.ZOOM_TOO_MANY_REQUESTS);
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(responseBody);
+    }
 
     // HTTP Status 500
     public static ResponseEntity<ResponseDto> mailSendFail() {
@@ -134,7 +151,7 @@ public class ResponseDto<T> {
         ResponseDto responseBody = new ResponseDto(ResponseCode.DENY_REFUND, ResponseMessage.DENY_REFUND);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
-    
+
     public static ResponseEntity<byte[]> successPdf(byte[] pdfContent) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/pdf");
@@ -143,5 +160,4 @@ public class ResponseDto<T> {
         // PDF 콘텐츠를 body로 직접 반환
         return ResponseEntity.ok().headers(headers).body(pdfContent);
     }
-
 }
