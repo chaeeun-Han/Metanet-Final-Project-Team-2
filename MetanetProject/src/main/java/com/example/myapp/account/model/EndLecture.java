@@ -1,19 +1,14 @@
 package com.example.myapp.account.model;
 
-import java.util.Date;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
-@AllArgsConstructor
-// 완료된 강의
+@Setter	
 public class EndLecture {
-	private String detailTitle;
-	private Date startTime;
-	private Date endTime;
-	private double coursePercent;
-	private double lectureId;
+	private String lecture_title;
+	private String start_date;
+	private String end_date;
+	private double course_percent;
+	private Long lecture_id;
 }
