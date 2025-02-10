@@ -14,7 +14,6 @@ import lombok.ToString;
 public class Lecture {
     private Long lectureId;
     private Long memberId;
-    private String teacher;
     private String title;
     private String profile;
     private String profileUrl;
@@ -24,7 +23,6 @@ public class Lecture {
     private String category;
     private Integer price;
     private Boolean status;
-    private String link;
     private Integer likes;
     private Integer limitStudent;
     private Integer enrolledStudents;

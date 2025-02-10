@@ -317,7 +317,6 @@ public class LectureRestController {
             if (lecture.getTitle() != null || lecture.getProfileUrl() != null ||
                     lecture.getDescription() != null || lecture.getDescriptionPicUrl() != null ||
                     lecture.getCategory() != null || lecture.getPrice() != null ||
-                    lecture.getStatus() != null || lecture.getLink() != null ||
                     lecture.getLimitStudent() != null || lecture.getDeadlineTime() != null ||
                     lecture.getLecturesDate() != null || lecture.getStartDate() != null ||
                     lecture.getEndDate() != null || lecture.getDeleted() != null) {
@@ -374,7 +373,6 @@ public class LectureRestController {
             if (lecture.getTitle() != null || lecture.getProfileUrl() != null ||
                     lecture.getDescription() != null || lecture.getDescriptionPicUrl() != null ||
                     lecture.getCategory() != null || lecture.getPrice() != null ||
-                    lecture.getStatus() != null || lecture.getLink() != null ||
                     lecture.getLimitStudent() != null || lecture.getDeadlineTime() != null ||
                     lecture.getLecturesDate() != null || lecture.getStartDate() != null ||
                     lecture.getEndDate() != null || lecture.getDeleted() != null) {
