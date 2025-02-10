@@ -42,6 +42,9 @@ public class SecurityConfig {
 				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
+				.requestMatchers("/account/lecture", "/account/category", "/account/update", "/account", "/account/pay-log"
+						,"/account/my-study").permitAll()
+				.requestMatchers("/account/teacher-lecture").hasAnyRole("Admin", "Teacher")
 				.requestMatchers("/lectures/all").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/*/reviews").permitAll()

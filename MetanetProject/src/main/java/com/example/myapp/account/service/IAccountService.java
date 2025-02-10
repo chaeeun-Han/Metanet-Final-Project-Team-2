@@ -14,7 +14,10 @@ public interface IAccountService {
 
 	ResponseEntity<ResponseDto> getMyPage(String user);
 
-//	ResponseEntity<ResponseDto> getMyTech(String user);
-//
-//	ResponseEntity<ResponseDto> getLectureDashBoard(String user);
+	ResponseEntity<ResponseDto> getPaylog(String user);
+
+	ResponseEntity<ResponseDto> getMyStudy(String user);
+
+	ResponseEntity<ResponseDto> getMyLecture(String user);
+
 }

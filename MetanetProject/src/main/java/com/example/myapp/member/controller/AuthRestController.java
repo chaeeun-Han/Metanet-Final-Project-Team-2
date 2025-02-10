@@ -66,6 +66,17 @@ public class AuthRestController {
 					return ResponseDto.nullInputValue(); // 은행 계좌 입력 값 없음
 				}
 			}
+			
+			// 역할이 teacher일 경우 은행 계좌 정보 검증
+			
+			if (member.getAttendId().isEmpty()) {
+				return ResponseDto.nullInputValue(); // 은행 계좌 정보 없음
+			}
+			
+			if (member.getName().isEmpty()) {
+				return ResponseDto.nullInputValue(); // 은행 계좌 정보 없음
+			}
+						
 
 			// 비밀번호 암호화
 			String encodedPw = passwordEncoder.encode(member.getPassword());

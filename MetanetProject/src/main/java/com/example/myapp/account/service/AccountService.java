@@ -1,11 +1,7 @@
 package com.example.myapp.account.service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonWriter.Members;
@@ -15,13 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.myapp.account.dao.IAccountRepository;
 import com.example.myapp.account.model.AccountLecture;
-import com.example.myapp.account.model.AdminLectureDashBoard;
-import com.example.myapp.account.model.AttendLecture;
 import com.example.myapp.account.model.DueToLecture;
 import com.example.myapp.account.model.EndLecture;
 import com.example.myapp.account.model.IngLecture;
-import com.example.myapp.account.model.MyTechDashBoard;
-import com.example.myapp.account.model.ProgressLecture;
+import com.example.myapp.account.model.MyStudy;
+import com.example.myapp.account.model.MyStudyLectureList;
+import com.example.myapp.account.model.Pay;
+import com.example.myapp.account.model.TeacherLecture;
 import com.example.myapp.common.response.ResponseCode;
 import com.example.myapp.common.response.ResponseDto;
 import com.example.myapp.common.response.ResponseMessage;
@@ -31,268 +27,185 @@ import com.example.myapp.util.S3FileUploader;
 @Service
 public class AccountService implements IAccountService {
 
-	@Autowired
-	IAccountRepository accountRepository;
+    @Autowired
+    IAccountRepository accountRepository;
 
-	@Autowired
-	IMemberRepository memberRepository;
+    @Autowired
+    IMemberRepository memberRepository;
 
-	@Autowired
-	S3FileUploader s3FileUploader;
+    @Autowired
+    S3FileUploader s3FileUploader;
 
-	@Override
-	public ResponseEntity<ResponseDto> getLecture(String memberId) {
+    @Override
+    public ResponseEntity<ResponseDto> getLecture(String memberId) {
+        List<AccountLecture> result = null;
+        try {
+            Long memberUID = memberRepository.getMemberIdById(memberId);
+            result = accountRepository.getLecture(memberUID);
 
-		List<AccountLecture> result = null;
-		try {
-			Long memberUID = memberRepository.getMemberIdById(memberId);
-			result = accountRepository.getLecture(memberUID);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseDto.databaseError();
-		}
-		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-		return ResponseEntity.ok(responseBody);
-	}
+            // 데이터가 없을 경우 빈 리스트 반환
+            if (result == null || result.isEmpty()) {
+                result = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+        return ResponseEntity.ok(responseBody);
+    }
 
-	@Override
-	public ResponseEntity<ResponseDto> insertCategory(String tags, String memberId) {
+    @Override
+    public ResponseEntity<ResponseDto> insertCategory(String tags, String memberId) {
+        Long memberUID = memberRepository.getMemberIdById(memberId);
+        String[] categories = tags.split(",");
 
-		Long memberUID = memberRepository.getMemberIdById(memberId);
+        try {
+            for (String cat : categories) {
+                accountRepository.insertCategory(memberUID, cat.trim());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
 
-		String[] categories = tags.split(",");
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.ok(responseBody);
+    }
 
-		try {
-			for (String cat : categories) {
-				accountRepository.insertCategory(memberUID, cat.trim());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseDto.databaseError();
-		}
+    @Override
+    public ResponseEntity<ResponseDto> updateProfile(String user, MultipartFile file) {
+        Long memberUID = memberRepository.getMemberIdById(user);
+        Long memberid = Long.valueOf(memberUID);
 
-		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-		return ResponseEntity.ok(responseBody);
-	}
+        String fileUrl = s3FileUploader.uploadFile(file, "members", "profile", memberid);
 
-	@Override
-	public ResponseEntity<ResponseDto> updateProfile(String user, MultipartFile file) {
-		Long memberUID = memberRepository.getMemberIdById(user);
-		Long memberid = Long.valueOf(memberUID);
+        try {
+            accountRepository.updateProfile(memberUID, fileUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
 
-		String fileUrl = s3FileUploader.uploadFile(file, "members", "profile", memberid);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+        return ResponseEntity.ok(responseBody);
+    }
 
-		try {
-			accountRepository.updateProfile(memberUID, fileUrl);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseDto.databaseError();
-		}
+    @Override
+    public ResponseEntity<ResponseDto> getMyPage(String user) {
+        Long memberUID = memberRepository.getMemberIdById(user);
+        List<Members> result = null;
 
-		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-		return ResponseEntity.ok(responseBody);
-	}
+        try {
+            result = accountRepository.getMyPage(memberUID);
 
-	@Override
-	public ResponseEntity<ResponseDto> getMyPage(String user) {
-		Long memberUID = memberRepository.getMemberIdById(user);
-		List<Members> result = null;
+            // 데이터가 없을 경우 빈 리스트 반환
+            if (result == null || result.isEmpty()) {
+                result = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
 
-		try {
-			result = accountRepository.getMyPage(memberUID);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseDto.databaseError();
-		}
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+        return ResponseEntity.ok(responseBody);
+    }
 
-		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-		return ResponseEntity.ok(responseBody);
+    @Override
+    public ResponseEntity<ResponseDto> getPaylog(String user) {
+        Long memberUID = memberRepository.getMemberIdById(user);
+        List<Pay> result = null;
 
-	}
+        try {
+            result = accountRepository.getPaylog(memberUID);
 
-	// 학습률 가져오기
-//	@SuppressWarnings("null")
-//	@Override
-//	public ResponseEntity<ResponseDto> getMyTech(String user) {
-//		String memberUID = memberRepository.getMemberIdById(user);
-//
-//		List<String> lectureIds = accountRepository.getLectureIdById(memberUID);
-//
-//		List<AttendLecture> attendLectures = new ArrayList<>(); // attendLectures 리스트를 초기화
-//
-//		for (String lectureId : lectureIds) {
-//
-//			String lectureTitle = accountRepository.getLectureTitleById(lectureId);
-//
-//			int allLectureCount = accountRepository.getAllLectureCount(lectureId);
-//			int attendLectureCount = countAttendLecuture(lectureId, memberUID);
-//			double attendPercent = 0.0;
-//
-//			if (allLectureCount > 0) {
-//				attendPercent = (double) attendLectureCount / allLectureCount * 100; // 출석률 계산
-//			}
-//
-//			AttendLecture attendLecture = new AttendLecture();
-//			attendLecture.setLectureTitle(lectureTitle);
-//			attendLecture.setAttendPercent(attendPercent);
-//
-//			attendLectures.add(attendLecture);
-//		}
-//
-//		List<ProgressLecture> progressLectures = new ArrayList<>();
-//
-//		for (String lectureId : lectureIds) {
-//
-//			List<String> lecture_list_ids = accountRepository.getLectureListId(lectureId);
-//
-//			for (String lecture_list_id : lecture_list_ids) {
-//				int allAttendTime = accountRepository.getAllAttendTime(lecture_list_id);
-//
-//				String lecture_detail_title = accountRepository.getLectureDetailTile(lecture_list_id);
-//				Integer attendLectureCount = accountRepository.getPlayTime(lecture_list_id, memberUID);
-//				int attendLectureCountValue = (attendLectureCount != null) ? attendLectureCount : 0; // null일 경우 0으로 처리
-//				double progressPercent = 0.0;
-//
-//				progressPercent = (double) attendLectureCountValue / allAttendTime * 100;
-//
-//				ProgressLecture progressLecture = new ProgressLecture();
-//				progressLecture.setDetailLectureTitle(lecture_detail_title);
-//				progressLecture.setProgressPercent(progressPercent);
-//
-//				progressLectures.add(progressLecture);
-//			}
-//		}
-//
-//		MyTechDashBoard result = new MyTechDashBoard(attendLectures, progressLectures);
-//
-//		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-//		return ResponseEntity.ok(responseBody);
-//	}
+            // 데이터가 없을 경우 빈 리스트 반환
+            if (result == null || result.isEmpty()) {
+                result = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDto.databaseError();
+        }
 
-	private int countAttendLecuture(String lectureId, String memberUID) {
-		List<String> lecture_list_ids = accountRepository.getLectureListId(lectureId);
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+        return ResponseEntity.ok(responseBody);
+    }
 
-		int countAttendLectureCount = 0;
+    @Override
+    public ResponseEntity<ResponseDto> getMyStudy(String user) {
+        Long memberUID = memberRepository.getMemberIdById(user);
 
-		for (String lecture_list_id : lecture_list_ids) {
+        // MyStudy 기본 정보를 조회
+        List<MyStudy> results = accountRepository.getMyStudy(memberUID);
 
-			int countAttendLecture = accountRepository.getCountAttendLecture(lecture_list_id, memberUID);
-			countAttendLectureCount += countAttendLecture;
-		}
+        // 데이터가 없을 경우 빈 리스트 반환
+        if (results == null || results.isEmpty()) {
+            results = new ArrayList<>();
+        }
 
-		return countAttendLectureCount;
-	}
+        // MyStudyLectureList를 조회하여 각 MyStudy 객체에 설정
+        for (MyStudy myStudy : results) {
+            // 각 MyStudy에 해당하는 강의 목록을 조회
+            List<MyStudyLectureList> lectureLists = accountRepository.getMyStudyLectureList(myStudy.getLectureId(),
+                    memberUID);
 
-//	@Override
-//	public ResponseEntity<ResponseDto> getLectureDashBoard(String user) {
-//		String memberUID = memberRepository.getMemberIdById(user);
-//
-//		// 진행 예정 강의
-//		List<DueToLecture> dueToLectures = new ArrayList<>();
-//
-//		LocalDateTime now = LocalDateTime.now();
-//		String formattedNow = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-//		dueToLectures = accountRepository.getDueToLecture(memberUID, formattedNow);
-//
-//		List<IngLecture> ingLectures = new ArrayList<>();
-//		List<String> lecture_ids = accountRepository.getLectureIdByTeacherId(memberUID);
-//		List<Object> attendPercentList = calculateAttendPercent(lecture_ids,memberUID);
-//		
-//		for (Object item : attendPercentList) {
-//			if (item instanceof Map) {
-//				Map<String, Double> attendData = (Map<String, Double>) item;
-//
-//				for (Map.Entry<String, Double> entry : attendData.entrySet()) {
-//					String lectureListId = entry.getKey();
-//					Double attendPercent = entry.getValue();
-//
-//					ingLectures = accountRepository.getIngLectures(attendPercent, memberUID, formattedNow,
-//							lectureListId);
-//				}
-//			}
-//		}
+            // 데이터가 없을 경우 빈 리스트 반환
+            if (lectureLists == null || lectureLists.isEmpty()) {
+                myStudy.setMyStudyLectureList(new ArrayList<>());
+            } else {
+                myStudy.setMyStudyLectureList(lectureLists);
+            }
+        }
 
-		// 완료된 강의
-//		List<EndLecture> endLectures = new ArrayList<>();
-//		List<Object> coursePercentList = calculateCoursePercent(lecture_ids, memberUID);
-//
-//		for (Object item : attendPercentList) {
-//			if (item instanceof Map) {
-//				Map<String, Double> attendData = (Map<String, Double>) item;
-//
-//				for (Map.Entry<String, Double> entry : attendData.entrySet()) {
-//					String lectureListId = entry.getKey();
-//					Double attendPercent = entry.getValue();
-//
-//					ingLectures = accountRepository.getEndLectures(attendPercent, memberUID, formattedNow,
-//							lectureListId);
-//				}
-//			}
-//		}
-//
-//		AdminLectureDashBoard result = new AdminLectureDashBoard(dueToLectures, ingLectures);
-//
-//		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-//		return ResponseEntity.ok(responseBody);
-//	}
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
+        return ResponseEntity.ok(responseBody);
+    }
 
-//	private List<Object> calculateAttendPercent(List<String> lecture_ids, String memberUID) {
-//		List<Object> result = new ArrayList<>();
-//
-//		double attendPercent = 0.0;
-//
-//		
-//		for (String lecture_id : lecture_ids) {
-//			List<String> lecture_list_ids = accountRepository.getLectureListIdFalse(lecture_id);
-//
-//			for (String lecture_list_id : lecture_list_ids) {
-//				int allStudent = accountRepository.getAllStudent(lecture_list_id);
-//				int noAttendStudent = accountRepository.getNoAttendStudent(lecture_list_id);
-//
-//				if (allStudent != 0) {
-//					attendPercent = (noAttendStudent / (double) allStudent) * 100;
-//				} else {
-//					attendPercent = 0.0; 
-//				}
-//
-//				
-//				Map<String, Double> attendData = new HashMap<>();
-//				attendData.put(lecture_list_id, attendPercent);
-//
-//			
-//				result.add(attendData);
-//			}
-//
-//		}
-//
-//		return result;
-//	}
+    @Override
+    public ResponseEntity<ResponseDto> getMyLecture(String user) {
+        Long memberUID = memberRepository.getMemberIdById(user);
 
-//	private List<Object> calculateCoursePercent(List<String> lecture_ids, String memberUID) {
-//		List<Object> result = new ArrayList<>();
-//		double attendPercent = 0.0;
-//	
-//		for (String lecture_id : lecture_ids) {
-//			List<String> lecture_list_ids = accountRepository.getLectureListIdTrue(lecture_id);
-//
-//			for (String lecture_list_id : lecture_list_ids) {				
-//				
-//				int allStudent = accountRepository.getAllStudent(lecture_list_id);
-//				int noAttendStudent = accountRepository.getNoAttendStudent(lecture_list_id);				
-//
-//				if (allStudent != 0) {
-//					attendPercent = (noAttendStudent / (double) allStudent) * 100;
-//				} else {
-//					attendPercent = 0.0; // 또는 원하는 기본값 (예: 0% 또는 -1 등)
-//				}
-//				
-//				if(attendPercent >= 80.0) {
-//					
-//				}					            
-//			}
-//
-//		}
-//
-//		return result;
-//	}
+        TeacherLecture results = getTeacherLectures(memberUID);
+
+        // 모든 강의 리스트가 비어 있으면 빈 데이터를 반환
+        if (results == null || (results.getDueToLecture().isEmpty() && results.getIngLecture().isEmpty()
+                && results.getEndLecture().isEmpty())) {
+            results = new TeacherLecture();
+            results.setDueToLecture(new ArrayList<>());
+            results.setIngLecture(new ArrayList<>());
+            results.setEndLecture(new ArrayList<>());
+        }
+
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
+        return ResponseEntity.ok(responseBody);
+    }
+
+    public TeacherLecture getTeacherLectures(Long teacherId) {
+        // 강의 상태별 데이터 조회
+        List<DueToLecture> dueToLectures = accountRepository.getDueToLectures(teacherId);
+        List<IngLecture> ingLectures = accountRepository.getIngLectures(teacherId);
+        List<EndLecture> endLectures = accountRepository.getEndLectures(teacherId);
+
+        // 데이터가 없을 경우 빈 리스트 반환
+        if (dueToLectures == null || dueToLectures.isEmpty()) {
+            dueToLectures = new ArrayList<>();
+        }
+        if (ingLectures == null || ingLectures.isEmpty()) {
+            ingLectures = new ArrayList<>();
+        }
+        if (endLectures == null || endLectures.isEmpty()) {
+            endLectures = new ArrayList<>();
+        }
+
+        // TeacherLecture 객체 생성 후 데이터 설정
+        TeacherLecture teacherLecture = new TeacherLecture();
+        teacherLecture.setDueToLecture(dueToLectures);
+        teacherLecture.setIngLecture(ingLectures);
+        teacherLecture.setEndLecture(endLectures);
+
+        return teacherLecture;
+    }
 }
+

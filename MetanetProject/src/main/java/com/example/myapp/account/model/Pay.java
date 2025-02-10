@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter	
-public class EndLecture {
-	private String title;
+@Setter
+public class Pay {
+	private Long payId;
+	private boolean status;
+	private int price;
 	private String startDate;
 	private String endDate;
-	private double coursePercent;
-	private Long lectureId;
 }

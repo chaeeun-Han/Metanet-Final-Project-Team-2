@@ -5,7 +5,7 @@
 <mapper namespace="com.example.myapp.account.dao.IAccountRepository">
 
 	<select id="getLecture" resultType="com.example.myapp.account.model.AccountLecture">
-		SELECT l.title, l.profile, l.category
+		SELECT l.title as title, l.profile as profile, l.category as category, a.is_coursable as isCoursable
 		FROM lectures l
 		JOIN attends a ON l.lecture_id = a.lecture_id
 		WHERE a.member_id =#{memberId}
@@ -26,99 +26,86 @@
 		SELECT * FROM members WHERE member_id = #{memberUID}
 	</select>	
 	
-	<select id="getLectureIdById" resultType="String">
-		SELECT lecture_id FROM 	attends
-		WHERE member_id = #{memberUID}
-	</select>
-	
-	<select id="getLectureTitleById" resultType="String">
-		SELECT title FROM lectures
-		WHERE lecture_id = #{lectureId}
-	</select>
-	
-	
-	<select id="getAllLectureCount" resultType="int">
-		SELECT COUNT(*)
-		FROM lecture_lists
-		WHERE lecture_id = #{lectureId}
-	</select>
-	
-	
-	<select id="getLectureListId" resultType="String">
-		SELECT lecture_list_id
-		FROM lecture_lists
-		WHERE lecture_id = #{lectureId}
-	</select>
-	
-	<select id="getCountAttendLecture" resultType="int">
-		SELECT COUNT(*)
-		FROM students
-		WHERE member_id =#{memberUID} AND enter_time is not NULL AND lecture_list_id =#{lecture_list_id}
-	</select>
-	
-	
-	<select id="getLectureDetailTile" resultType="String">
-		SELECT title
-		FROM lecture_lists
-		WHERE lecture_list_id = #{lecture_list_id};	
-	</select>
-	
-	<select id="getAllAttendTime" resultType="int">
-		SELECT TIMESTAMPDIFF(SECOND, start_time, end_time) AS duration_in_seconds
-		FROM  lecture_lists
-		WHERE lecture_list_id = #{lecture_list_id};
-	</select>
-	
-	<select id="getPlayTime" resultType="java.lang.Integer">
-	    SELECT IFNULL(play_time, 0)
-	    FROM students
-	    WHERE lecture_list_id = #{lecture_list_id} AND member_id = #{memberUID} AND play_time IS NOT NULL
-	</select>
-	
-	<select id="getDueToLecture" resultType="com.example.myapp.account.model.DueToLecture">
-	<![CDATA[
-	    SELECT title, start_time, end_time
-	    FROM lecture_lists
-	    WHERE member_id = #{memberUID} AND start_time > #{formattedNow};	    
-	 ]]>
-	</select>
- 
-	<select id="getIngLectures" resultType="com.example.myapp.account.model.IngLecture">
-	<![CDATA[
-	    SELECT title, start_time, end_time, lecture_list_id, #{attendPercent}
-	    FROM lecture_lists
-	    WHERE member_id = #{memberUID} AND finished = false AND lecture_list_id = #{lectureListId};	    
-	 ]]>	
-	</select>
-
-	<select id="getLectureListIdFalse" resultType="String">
-		SELECT lecture_list_id
-		FROM lecture_lists
-		WHERE lecture_id = #{lectureId} AND finished = false
-	</select>
-	
-	
 	<select id="getAllStudent" resultType="int">
 		SELECT COUNT(*)
 		FROM students
 		WHERE lecture_list_id = #{lecutre_list_id}
 	</select>
 	
-	<select id="getNoAttendStudent" resultType="int">
-		SELECT COUNT(*)
-		FROM students
-		WHERE lecture_list_id = #{lecutre_list_id} AND enter_time is null
+	<select id="getPaylog" resultType="com.example.myapp.account.model.Pay">
+		SELECT p.pay_id as payId, p.status as status, p.price as price, l.start_date as startDate, l.end_date as endDate
+		FROM attends a
+		JOIN lectures l ON l.lecture_id = a.lecture_id
+		JOIN pays p ON p.lecture_id = a.lecture_id
+		WHERE a.member_id = #{memberUID}
 	</select>
 	
-	<select id="getLectureIdByTeacherId" resultType="String">
-		SELECT lecture_id FROM 	lecture_lists
-		WHERE member_id = #{memberUID}
+	<select id="getMyStudy" resultType="com.example.myapp.account.model.MyStudy">
+		SELECT   
+			lec.lecture_id as lectureId,
+		    lec.title as title,
+		    lec.start_date as startTime,
+		    lec.end_date as endTime,
+		    COUNT(CASE WHEN s.is_attend = TRUE THEN 1 END) * 100 / COUNT(*) AS attendPercent
+		FROM students s
+		JOIN lecture_lists l ON s.lecture_list_id = l.lecture_list_id
+		JOIN members m ON s.member_id = m.member_id
+		JOIN lectures lec ON l.lecture_id = lec.lecture_id 
+		WHERE m.member_id = #{memberUID}
+		GROUP BY m.member_id, m.name, l.lecture_id, lec.title
+		ORDER BY m.member_id, l.lecture_id;
 	</select>
 	
-	<select id="getLectureListIdTrue" resultType="String">
-		SELECT lecture_list_id
-		FROM lecture_lists
-		WHERE lecture_id = #{lectureId} AND finished = true
+	<select id="getMyStudyLectureList" resultType="com.example.myapp.account.model.MyStudyLectureList">
+		SELECT l.lecture_list_id as lectureListId, l.title, s.is_attend as isAttend, l.end_time as endTime, l.start_time as startTime, lec.lecture_id as lectureId
+		FROM students s
+		JOIN lecture_lists l ON s.lecture_list_id = l.lecture_list_id
+		JOIN lectures lec ON l.lecture_id = lec.lecture_id 
+		WHERE s.member_id =#{memberUID} AND lec.lecture_id =#{lecture_id};	
 	</select>
 	
+	
+	<select id="getDueToLectures" resultType="com.example.myapp.account.model.DueToLecture">
+		SELECT title, start_date as startDate, end_date as endDate
+		FROM lectures 
+		WHERE member_id =#{teacherId}
+	</select>
+	
+	<select id="getIngLectures" resultType="com.example.myapp.account.model.IngLecture">
+	    <![CDATA[
+	    SELECT
+	        lec.lecture_id as lectureId,
+	        ll.title AS title,
+	        ll.start_time as startTime,
+	        ll.end_time as endTime,
+	        (SUM(CASE WHEN s.is_attend = TRUE THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(DISTINCT s.member_id), 0)) AS attendPercent
+	    FROM lectures lec
+	    JOIN lecture_lists ll ON lec.lecture_id = ll.lecture_id
+	    LEFT JOIN students s ON ll.lecture_list_id = s.lecture_list_id
+	    WHERE lec.member_id = #{teacherId}
+	    AND DATE(lec.start_date) <= CURDATE()
+	    AND DATE(lec.end_date) >= CURDATE()
+	    GROUP BY ll.lecture_list_id, lec.lecture_id, ll.title, ll.start_time, ll.end_time, lec.start_date, lec.end_date;
+	    ]]>
+	</select>
+
+	
+	<select id="getEndLectues" resultType="com.example.myapp.account.model.EndLecture">
+	<![CDATA[
+	    SELECT
+	        l.title AS title,
+	        l.start_date as startDate,
+	        l.end_date as endDate,
+	        l.lecture_id as lectureId,
+	        (SUM(CASE WHEN a.is_coursable = TRUE THEN 1 ELSE 0 END) * 100.0) /
+	        NULLIF(COUNT(DISTINCT a.member_id), 0) AS coursePercent
+	    FROM lectures l
+	    JOIN attends a ON l.lecture_id = a.lecture_id
+	    WHERE a.member_id = #{teacherId}
+	    AND DATE(l.end_date) < CURDATE()
+	    GROUP BY l.lecture_id, l.title, l.start_date, l.end_date;
+	]]>  
+	</select>
+
+
 </mapper>
