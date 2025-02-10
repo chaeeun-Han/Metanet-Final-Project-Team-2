@@ -5,13 +5,14 @@
 <mapper namespace="com.classpick.web.member.dao.IMemberRepository">
 
 	<insert id="insertMember" parameterType="com.classpick.web.member.model.Member">
-		<![CDATA[
-			INSERT INTO 
-				members id, name, password, phone, email, role, deleted, birth, profile, bank, attend_id as attendId 
-			VALUES 
-				(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank}, #{attend_id})
-		]]>
+	    <![CDATA[
+	        INSERT INTO 
+	            members (id, name, password, phone, email, role, deleted, birth, profile, bank, attend_id)
+	        VALUES 
+	            (#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank}, #{attendId})
+	    ]]>
 	</insert>
+
 
 	<select id="findById" resultType="com.classpick.web.member.model.Member">
 		SELECT * FROM members WHERE id = #{id}
@@ -102,4 +103,10 @@
 		FROM members
 		WHERE member_id = #{memberUID}
 	</select>
+	
+	<select id="isEmailDuplicated" resultType="int">
+		SELECT COUNT(*) from members
+		WHERE email = #{email}
+	</select>
+	
 </mapper>
