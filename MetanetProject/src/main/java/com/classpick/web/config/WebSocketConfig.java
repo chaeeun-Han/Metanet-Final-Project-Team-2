@@ -51,8 +51,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         }
                         return null;
                     }
-                })
-                .withSockJS();
+                });
     }
 
     @Override
