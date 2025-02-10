@@ -10,8 +10,7 @@ import lombok.Setter;
 public class MyStudyLectureList {
 	private Long lectureListId;
 	private String title;
-	private boolean isAttend;
-	private String attend_status;
+	private boolean isAttend;	
 	private String startTime;
 	private String endTime;
 	private Long lectureId;
