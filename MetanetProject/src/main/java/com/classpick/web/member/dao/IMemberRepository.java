@@ -50,5 +50,7 @@ public interface IMemberRepository {
 	Member getToolMember(Long usmemberUIDer);
 
 	Member findByUserId(String user);
+
+	int isEmailDuplicated(String email);
 	
 }

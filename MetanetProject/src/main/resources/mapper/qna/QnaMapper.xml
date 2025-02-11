@@ -30,10 +30,10 @@
 	
 	<select id="getQuestionSummaries" parameterType="long" resultType="com.classpick.web.qna.model.QuestionSummary">
 		SELECT q.question_id AS questionId, q.title AS title, m.id AS writer, q.board_date AS date, 
-			(SELECT COUNT(*) FROM answers a WHERE a.question_id = q.question_id) AS answerCount
+		   (SELECT COUNT(*) FROM answers a WHERE a.question_id = q.question_id) AS answerCount
 		FROM questions q 
 		JOIN members m ON q.member_id = m.member_id
-		WHERE q.deleted = 0
+		WHERE q.deleted = 0 and q.lecture_id = ${lectureId}
 		ORDER BY board_date DESC
 	</select>
 

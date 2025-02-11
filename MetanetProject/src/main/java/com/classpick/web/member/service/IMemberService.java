@@ -47,4 +47,6 @@ public interface IMemberService {
 	List<MemberForExcel> getMembersByLecture(Long lectureId);
 
 	ResponseEntity<ResponseDto> toolMember(String user);
+
+	boolean isEmailDuplicated(String email);
 }

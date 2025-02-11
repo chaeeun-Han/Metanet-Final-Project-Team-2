@@ -43,56 +43,59 @@ public class AuthRestController {
 	@PostMapping("/join")
 	public ResponseEntity<ResponseDto> join(@RequestBody Member member) {
 
-		try {
-			// 전화번호 검증
+	    try {
+	        // 전화번호 검증
+	        if (member.getPhone() != null && !regexUtil.telNumber(member.getPhone())) {
+	            return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Phone value not match Regex"));
+	        }
 
-			if (member.getPhone() != null && !regexUtil.telNumber(member.getPhone())) {
-				return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Phone value not match Regex"));
-			}
+	        // 이메일 검증
+	        if (member.getEmail() != null && !regexUtil.checkEmail(member.getEmail())) {
+	            return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Email value not match Regex"));
+	        }
 
-			// 이메일 검증
-			if (member.getEmail() != null && !regexUtil.checkEmail(member.getEmail())) {
-				return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Email value not match Regex"));
-			}
+	        // 이메일 중복 체크
+	        if (memberService.isEmailDuplicated(member.getEmail())) {
+	            return ResponseEntity.badRequest().body(new ResponseDto("DUPLICATED_EMAIL", "Email already exists"));
+	        }
 
-			// 비밀번호 검증
-			if (member.getPassword() != null && !regexUtil.checkPassword(member.getPassword())) {
-				return ResponseEntity.badRequest()
-						.body(new ResponseDto("REGEX_ERROR", "Password value not match Regex"));
-			}
+	        // 비밀번호 검증
+	        if (member.getPassword() != null && !regexUtil.checkPassword(member.getPassword())) {
+	            return ResponseEntity.badRequest()
+	                    .body(new ResponseDto("REGEX_ERROR", "Password value not match Regex"));
+	        }
 
-			// 역할이 teacher일 경우 은행 계좌 정보 검증
-			if (member.getRole().equals("teacher")) {
-				if (member.getBank().isEmpty()) {
-					return ResponseDto.nullInputValue(); // 은행 계좌 입력 값 없음
-				}
-			}
-			
-			// 역할이 teacher일 경우 은행 계좌 정보 검증
-			
-			if (member.getAttendId().isEmpty()) {
-				return ResponseDto.nullInputValue(); // 은행 계좌 정보 없음
-			}
-			
-			if (member.getName().isEmpty()) {
-				return ResponseDto.nullInputValue(); // 은행 계좌 정보 없음
-			}
-						
+	        // 역할이 teacher일 경우 은행 계좌 정보 검증
+	        if (member.getRole().equals("teacher")) {
+	            if (member.getBank().isEmpty()) {
+	                return ResponseDto.nullInputValue(); // 은행 계좌 입력 값 없음
+	            }
+	        }
 
-			// 비밀번호 암호화
-			String encodedPw = passwordEncoder.encode(member.getPassword());
-			member.setPassword(encodedPw);
+	        // 역할이 teacher일 경우 은행 계좌 정보 검증
+	        if (member.getAttendId().isEmpty()) {
+	            return ResponseDto.nullInputValue(); // 은행 계좌 정보 없음
+	        }
 
-			// 회원 정보 저장
-			memberService.insertMember(member);
+	        if (member.getName().isEmpty()) {
+	            return ResponseDto.nullInputValue(); // 이름 정보 없음
+	        }
 
-		} catch (DuplicateKeyException e) {
-			member.setId(null);
-			return ResponseDto.duplicatedId(); // ID 중복 오류
-		}
+	        // 비밀번호 암호화
+	        String encodedPw = passwordEncoder.encode(member.getPassword());
+	        member.setPassword(encodedPw);
 
-		return ResponseDto.success(); // 회원가입 성공
+	        // 회원 정보 저장
+	        memberService.insertMember(member);
+
+	    } catch (DuplicateKeyException e) {
+	        member.setId(null);
+	        return ResponseDto.duplicatedId(); // ID 중복 오류
+	    }
+
+	    return ResponseDto.success(); // 회원가입 성공
 	}
+
 
 	// 로그인 - 신영서
 	@PostMapping("/login")
