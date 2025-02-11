@@ -50,10 +50,11 @@
 	</select>
 	
 	<update id="resetEmail">
-		UPDATE members
-		(email) SET #{email}
-		WHERE member_id = #{memberUID}  
+	    UPDATE members
+	    SET email = #{email}
+	    WHERE member_id = #{memberUID}
 	</update>
+
 
 	<select id="getAllMembers" resultType="com.classpick.web.member.model.MemberResponse">
 		<![CDATA[
@@ -101,5 +102,15 @@
 		SELECT attend_id AS attendId
 		FROM members
 		WHERE member_id = #{memberUID}
+	</select>
+	
+	<select id="getToolMember" resultType="com.classpick.web.member.model.Member">
+		SELECT profile, name, role, email, phone, birth, bank
+		FROM members
+		WHERE member_id = #{memberUID}	
+	</select>
+	
+	<select id="findByUserId" resultType="com.classpick.web.member.model.Member">
+		SELECT * FROM members WHERE id = #{id}
 	</select>
 </mapper>

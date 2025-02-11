@@ -13,17 +13,17 @@
 	
 	<insert id="insertCategory">
 		INSERT INTO members_tags (member_id, tag_id)
-		VALUES (#{memberId}, (SELECT tag_id FROM tags WHERE tag_name = #{tagName}));
+		VALUES (#{memberUID}, (SELECT tag_id FROM tags WHERE tag_name = #{tagName}));
 	</insert>
 	
 	<update id="updateProfile">
 		UPDATE members
-		SET profile = #{fileUrl}
+		SET profile = #{fileUrl}, birth=#{birth}, name=#{name}, phone=#{phone}, attend_id = #{attend_id}
 		WHERE member_id = #{memberUID}
 	</update>
 	
 	<select id="getMyPage" resultType="com.classpick.web.member.model.Member">
-		SELECT * FROM members WHERE member_id = #{memberUID}
+		SELECT profile, id, password, phone, email, birth, name, role, bank, deleted, attend_id as attendId FROM members WHERE member_id = #{memberUID}
 	</select>	
 	
 	<select id="getAllStudent" resultType="int">
@@ -33,7 +33,7 @@
 	</select>
 	
 	<select id="getPaylog" resultType="com.classpick.web.account.model.Pay">
-		SELECT p.pay_id as payId, p.status as status, p.price as price, l.start_date as startDate, l.end_date as endDate
+		SELECT p.pay_id as payId, p.status as status, p.price as price, l.start_date as startDate, l.end_date as endDate, l.title, l.profile
 		FROM attends a
 		JOIN lectures l ON l.lecture_id = a.lecture_id
 		JOIN pays p ON p.lecture_id = a.lecture_id
@@ -90,7 +90,7 @@
 	</select>
 
 	
-	<select id="getEndLectues" resultType="com.classpick.web.account.model.EndLecture">
+	<select id="getEndLectures" resultType="com.classpick.web.account.model.EndLecture">
 	<![CDATA[
 	    SELECT
 	        l.title AS title,
@@ -106,6 +106,43 @@
 	    GROUP BY l.lecture_id, l.title, l.start_date, l.end_date;
 	]]>  
 	</select>
+	
+	<select id="getMyCategory" resultType="String">
+		SELECT tag_name
+		FROM members_tags m
+		JOIN tags t ON m.tag_id = t.tag_id  
+		WHERE m.member_id = #{memberUID}
+	</select>
 
-
+	<select id="getCategory" resultType="String">
+		SELECT tag_name
+		FROM tags
+	</select>
+	
+	<select id="selectCount" resultType="int">
+		SELECT COUNT(*)
+		FROM members_tags where member_id = #{memberUID}
+	</select>
+	
+	<delete id="deleteCategory">
+		DELETE FROM members_tags WHERE member_id = #{memberUID}
+	</delete>
+	
+	<update id="updateBank">
+		UPDATE members
+		SET bank = #{bank}
+		WHERE member_id = #{memberUID}
+	</update>
+	
+	<update id="deleteBank">
+		UPDATE members
+		SET bank = null
+		WHERE member_id = #{memberUID}	
+	</update>
+	
+	<update id="addBank">
+		UPDATE members 
+		SET bank = #{bank}
+		WHERE member_id = #{memberUID};
+	</update>
 </mapper>
