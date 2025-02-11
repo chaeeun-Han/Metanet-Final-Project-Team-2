@@ -6,6 +6,8 @@ import lombok.Data;
 
 @Data
 public class Notification {
-	private String message;
-	private LocalDateTime timestamp;
+   private String message;
+   private LocalDateTime timestamp;
+   private Long lectureId;
+   private Long questionId;
 }
