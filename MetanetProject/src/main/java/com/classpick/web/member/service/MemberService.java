@@ -126,9 +126,8 @@ public class MemberService implements IMemberService {
 			templateData = authCode;
 
 			// 인증 코드 Redis 저장
-			if (data instanceof String) {
-				redisUtil.setDataExpire(email, (String) authCode, 60 * 30L);
-			}
+
+			redisUtil.setDataExpire(email, (String) authCode, 60 * 30L);
 
 		} else if ("lecture_schedule".equals(type)) {
 			subject = "[Metanet] 강의 일정 안내";
@@ -327,5 +326,15 @@ public class MemberService implements IMemberService {
 	@Override
 	public List<MemberForExcel> getMembersByLecture(Long lectureId) {
 		return memberRepository.getMembersByLecture(lectureId);
+	}
+
+	@Override
+	public boolean isEmailDuplicated(String email) {
+		int result = memberRepository.isEmailDuplicated(email);
+		if(result != 0) {
+			return true;
+		}else {			
+			return false;
+		}		
 	}
 }

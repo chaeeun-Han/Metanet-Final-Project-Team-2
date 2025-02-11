@@ -45,5 +45,7 @@ public interface IMemberRepository {
 	List<MemberForExcel> getMembersByLecture(Long lectureId);
 	
 	String getAttendIdById(Long memberUID);
+
+	int isEmailDuplicated(String email);
 	
 }

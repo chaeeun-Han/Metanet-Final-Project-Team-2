@@ -45,4 +45,6 @@ public interface IMemberService {
 	ResponseEntity<ResponseDto> resetEmail(String user, String email);
 
 	List<MemberForExcel> getMembersByLecture(Long lectureId);
+
+	boolean isEmailDuplicated(String email);
 }
