@@ -309,7 +309,7 @@ public class AuthRestController {
 		return memberService.resetEmail(user, member.getEmail());		
 	}
 	
-	@GetMapping("/Toolbarmember")
+	@GetMapping("/toolbarmember")
 	public ResponseEntity<ResponseDto> toolMember() {
 		String user = GetAuthenUser.getAuthenUser();
 
