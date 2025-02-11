@@ -12,9 +12,9 @@
 	<groupId>com.classpick</groupId>
 	<artifactId>classpick</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>classpick</name>
-	<description>SpringBook_Chapter10_SpringSecurity_JWT</description>
+	<description>Metanet Final Project</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
