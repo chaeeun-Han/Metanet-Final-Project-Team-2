@@ -23,7 +23,7 @@ public class LogAspect {
 	
 	private final IAopRepository aopRepository;
 	
-	@Around("execution(* com.example.myapp..*Service.*(..))")
+	@Around("execution(* com.classpick.web..*Service.*(..))")
 	public Object logServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
 		
 		String className = joinPoint.getTarget().getClass().getSimpleName();
