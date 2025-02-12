@@ -340,6 +340,7 @@ public class MemberService implements IMemberService {
 		// 코드가 일치하는 경우
 		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, toolbarMember);
 		return ResponseEntity.ok(responseBody);
+	}
 
 	public boolean isEmailDuplicated(String email) {
 		int result = memberRepository.isEmailDuplicated(email);

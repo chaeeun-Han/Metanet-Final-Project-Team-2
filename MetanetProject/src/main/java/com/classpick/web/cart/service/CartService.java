@@ -60,8 +60,7 @@ public class CartService implements ICartService{
 			Long memberUID = memberRepository.getMemberIdById(memberId);
 			for (Long cartId : cartIds) {
 				String dbMemberId = cartRepository.getMemberIdbyCartId(cartId);
-			
-				if (!memberUID.equals(dbMemberId)) {
+				if (!memberUID.toString().equals(dbMemberId)) {
 					return ResponseDto.certificateFail();
 				}
 				

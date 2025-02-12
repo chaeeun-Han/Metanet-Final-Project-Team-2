@@ -66,7 +66,7 @@ public class AuthRestController {
 	        }
 
 	        // 역할이 teacher일 경우 은행 계좌 정보 검증
-	        if (member.getRole().equals("teacher")) {
+	        if (member.getRole().equals("Teacher")) {
 	            if (member.getBank().isEmpty()) {
 	                return ResponseDto.nullInputValue(); // 은행 계좌 입력 값 없음
 	            }
