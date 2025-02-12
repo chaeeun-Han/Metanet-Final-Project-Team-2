@@ -17,6 +17,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import com.classpick.web.account.dao.IAccountRepository;
 import com.classpick.web.common.response.ResponseCode;
 import com.classpick.web.common.response.ResponseDto;
 import com.classpick.web.common.response.ResponseMessage;
@@ -27,7 +28,7 @@ import com.classpick.web.jwt.model.RefreshToken;
 import com.classpick.web.jwt.service.RedisTokenService;
 import com.classpick.web.member.dao.IMemberRepository;
 import com.classpick.web.member.model.Member;
-import com.classpick.web.member.model.MemberResponse;
+import com.classpick.web.member.model.ToolBarMember;
 import com.classpick.web.util.RedisUtil;
 
 import jakarta.mail.MessagingException;
@@ -53,6 +54,9 @@ public class MemberService implements IMemberService {
 	@Autowired
 	IMemberRepository memberRepository;
 
+	@Autowired
+	IAccountRepository accountRepository;
+	
 	@Autowired
 	JwtTokenProvider jwtProvider;
 
@@ -104,29 +108,25 @@ public class MemberService implements IMemberService {
 	private MimeMessage createEmailForm(String type, String email, Object data) throws MessagingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		message.addRecipients(MimeMessage.RecipientType.TO, email);
-		if (type.equals("join")) {
-			message.setSubject("[Metanet] 회원가입 이메일 인증번호입니다.");
-		} else if (type.equals("password")) {
-			message.setSubject("[Metanet] 비밀번호 재발급 인증번호입니다.");
-		} else if (type.equals("password")) {
-			message.setSubject("[Metanet] 이메일 수정 인증번호입니다.");
-		}
-
 		message.setFrom(senderEmail);
 
-		String subject;
+		String subject = null;
 		String templateName;
 		Object templateData;
 
 		// 이메일 종류에 따른 템플릿 및 데이터 설정
-		if ("join".equals(type) || "password".equals(type)) {
-			subject = "join".equals(type) ? "[Metanet] 회원가입 이메일 인증번호입니다." : "[Metanet] 비밀번호 재발급 인증번호입니다.";
+		if ("join".equals(type) || "password".equals(type)|| "email".equals(type)  ) {
+			if (type.equals("join")) {
+				subject = "[Metanet] 회원가입 이메일 인증번호입니다.";
+			} else if (type.equals("password")) {
+				subject = "[Metanet] 비밀번호 재발급 인증번호입니다.";				
+			} else if (type.equals("email")) {
+				subject = "[Metanet] 이메일 수정 인증번호입니다.";				
+			}
 			templateName = "member/mail";
 			String authCode = createCode();
 			templateData = authCode;
-
-			// 인증 코드 Redis 저장
-
+			
 			redisUtil.setDataExpire(email, (String) authCode, 60 * 30L);
 
 		} else if ("lecture_schedule".equals(type)) {
@@ -329,6 +329,18 @@ public class MemberService implements IMemberService {
 	}
 
 	@Override
+	public ResponseEntity<ResponseDto> toolMember(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		ToolBarMember toolbarMember = new ToolBarMember();
+		
+		Member member =  memberRepository.getToolMember(memberUID);
+		List<String> tag_name = accountRepository.getMyCategory(memberUID);
+		toolbarMember.setMember(member);
+		toolbarMember.setCategory(tag_name);
+		// 코드가 일치하는 경우
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, toolbarMember);
+		return ResponseEntity.ok(responseBody);
+
 	public boolean isEmailDuplicated(String email) {
 		int result = memberRepository.isEmailDuplicated(email);
 		if(result != 0) {

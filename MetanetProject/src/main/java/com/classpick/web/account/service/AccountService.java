@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonWriter.Members;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.classpick.web.account.dao.IAccountRepository;
 import com.classpick.web.account.model.AccountLecture;
+import com.classpick.web.account.model.AccountMembers;
 import com.classpick.web.account.model.DueToLecture;
 import com.classpick.web.account.model.EndLecture;
 import com.classpick.web.account.model.IngLecture;
@@ -18,6 +17,7 @@ import com.classpick.web.account.model.MyStudy;
 import com.classpick.web.account.model.MyStudyLectureList;
 import com.classpick.web.account.model.Pay;
 import com.classpick.web.account.model.TeacherLecture;
+import com.classpick.web.account.model.UpdateMember;
 import com.classpick.web.common.response.ResponseCode;
 import com.classpick.web.common.response.ResponseDto;
 import com.classpick.web.common.response.ResponseMessage;
@@ -27,185 +27,238 @@ import com.classpick.web.util.S3FileUploader;
 @Service
 public class AccountService implements IAccountService {
 
-    @Autowired
-    IAccountRepository accountRepository;
+	@Autowired
+	IAccountRepository accountRepository;
 
-    @Autowired
-    IMemberRepository memberRepository;
+	@Autowired
+	IMemberRepository memberRepository;
 
-    @Autowired
-    S3FileUploader s3FileUploader;
+	@Autowired
+	S3FileUploader s3FileUploader;
 
-    @Override
-    public ResponseEntity<ResponseDto> getLecture(String memberId) {
-        List<AccountLecture> result = null;
-        try {
-            Long memberUID = memberRepository.getMemberIdById(memberId);
-            result = accountRepository.getLecture(memberUID);
+	@Override
+	public ResponseEntity<ResponseDto> getLecture(String memberId) {
+		List<AccountLecture> result = null;
+		try {
+			Long memberUID = memberRepository.getMemberIdById(memberId);
+			result = accountRepository.getLecture(memberUID);
 
-            // 데이터가 없을 경우 빈 리스트 반환
-            if (result == null || result.isEmpty()) {
-                result = new ArrayList<>();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDto.databaseError();
-        }
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-        return ResponseEntity.ok(responseBody);
-    }
+			// 데이터가 없을 경우 빈 리스트 반환
+			if (result == null || result.isEmpty()) {
+				result = new ArrayList<>();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+		return ResponseEntity.ok(responseBody);
+	}
 
-    @Override
-    public ResponseEntity<ResponseDto> insertCategory(String tags, String memberId) {
-        Long memberUID = memberRepository.getMemberIdById(memberId);
-        String[] categories = tags.split(",");
+	
+	@Override
+	public ResponseEntity<ResponseDto> getMyPage(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
 
-        try {
-            for (String cat : categories) {
-                accountRepository.insertCategory(memberUID, cat.trim());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDto.databaseError();
-        }
+		// ✅ 객체를 초기화하여 NPE 방지
+		AccountMembers result = new AccountMembers();
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.ok(responseBody);
-    }
+		try {
+			result.setMembers(accountRepository.getMyPage(memberUID));
+			result.setMyCategory(accountRepository.getMyCategory(memberUID));
+			result.setCategory(accountRepository.getCategory());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
 
-    @Override
-    public ResponseEntity<ResponseDto> updateProfile(String user, MultipartFile file) {
-        Long memberUID = memberRepository.getMemberIdById(user);
-        Long memberid = Long.valueOf(memberUID);
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+		return ResponseEntity.ok(responseBody);
+	}
 
-        String fileUrl = s3FileUploader.uploadFile(file, "members", "profile", memberid);
+	@Override
+	public ResponseEntity<ResponseDto> getPaylog(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		List<Pay> result = null;
 
-        try {
-            accountRepository.updateProfile(memberUID, fileUrl);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDto.databaseError();
-        }
+		try {
+			result = accountRepository.getPaylog(memberUID);
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.ok(responseBody);
-    }
+			// 데이터가 없을 경우 빈 리스트 반환
+			if (result == null || result.isEmpty()) {
+				result = new ArrayList<>();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
 
-    @Override
-    public ResponseEntity<ResponseDto> getMyPage(String user) {
-        Long memberUID = memberRepository.getMemberIdById(user);
-        List<Members> result = null;
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
+		return ResponseEntity.ok(responseBody);
+	}
 
-        try {
-            result = accountRepository.getMyPage(memberUID);
+	@Override
+	public ResponseEntity<ResponseDto> getMyStudy(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
 
-            // 데이터가 없을 경우 빈 리스트 반환
-            if (result == null || result.isEmpty()) {
-                result = new ArrayList<>();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDto.databaseError();
-        }
+		// MyStudy 기본 정보를 조회
+		List<MyStudy> results = accountRepository.getMyStudy(memberUID);
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-        return ResponseEntity.ok(responseBody);
-    }
+		// 데이터가 없을 경우 빈 리스트 반환
+		if (results == null || results.isEmpty()) {
+			results = new ArrayList<>();
+		}
 
-    @Override
-    public ResponseEntity<ResponseDto> getPaylog(String user) {
-        Long memberUID = memberRepository.getMemberIdById(user);
-        List<Pay> result = null;
+		// MyStudyLectureList를 조회하여 각 MyStudy 객체에 설정
+		for (MyStudy myStudy : results) {
+			// 각 MyStudy에 해당하는 강의 목록을 조회
+			List<MyStudyLectureList> lectureLists = accountRepository.getMyStudyLectureList(myStudy.getLectureId(),
+					memberUID);
 
-        try {
-            result = accountRepository.getPaylog(memberUID);
+			// 데이터가 없을 경우 빈 리스트 반환
+			if (lectureLists == null || lectureLists.isEmpty()) {
+				myStudy.setMyStudyLectureList(new ArrayList<>());
+			} else {
+				myStudy.setMyStudyLectureList(lectureLists);
+			}
+		}
 
-            // 데이터가 없을 경우 빈 리스트 반환
-            if (result == null || result.isEmpty()) {
-                result = new ArrayList<>();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDto.databaseError();
-        }
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
+		return ResponseEntity.ok(responseBody);
+	}
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, result);
-        return ResponseEntity.ok(responseBody);
-    }
+	@Override
+	public ResponseEntity<ResponseDto> getMyLecture(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
 
-    @Override
-    public ResponseEntity<ResponseDto> getMyStudy(String user) {
-        Long memberUID = memberRepository.getMemberIdById(user);
+		TeacherLecture results = getTeacherLectures(memberUID);
 
-        // MyStudy 기본 정보를 조회
-        List<MyStudy> results = accountRepository.getMyStudy(memberUID);
+		// 모든 강의 리스트가 비어 있으면 빈 데이터를 반환
+		if (results == null || (results.getDueToLecture().isEmpty() && results.getIngLecture().isEmpty()
+				&& results.getEndLecture().isEmpty())) {
+			results = new TeacherLecture();
+			results.setDueToLecture(new ArrayList<>());
+			results.setIngLecture(new ArrayList<>());
+			results.setEndLecture(new ArrayList<>());
+		}
 
-        // 데이터가 없을 경우 빈 리스트 반환
-        if (results == null || results.isEmpty()) {
-            results = new ArrayList<>();
-        }
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
+		return ResponseEntity.ok(responseBody);
+	}
 
-        // MyStudyLectureList를 조회하여 각 MyStudy 객체에 설정
-        for (MyStudy myStudy : results) {
-            // 각 MyStudy에 해당하는 강의 목록을 조회
-            List<MyStudyLectureList> lectureLists = accountRepository.getMyStudyLectureList(myStudy.getLectureId(),
-                    memberUID);
+	public TeacherLecture getTeacherLectures(Long teacherId) {
+		// 강의 상태별 데이터 조회
+		List<DueToLecture> dueToLectures = accountRepository.getDueToLectures(teacherId);
+		List<IngLecture> ingLectures = accountRepository.getIngLectures(teacherId);
+		List<EndLecture> endLectures = accountRepository.getEndLectures(teacherId);
 
-            // 데이터가 없을 경우 빈 리스트 반환
-            if (lectureLists == null || lectureLists.isEmpty()) {
-                myStudy.setMyStudyLectureList(new ArrayList<>());
-            } else {
-                myStudy.setMyStudyLectureList(lectureLists);
-            }
-        }
+		// 데이터가 없을 경우 빈 리스트 반환
+		if (dueToLectures == null || dueToLectures.isEmpty()) {
+			dueToLectures = new ArrayList<>();
+		}
+		if (ingLectures == null || ingLectures.isEmpty()) {
+			ingLectures = new ArrayList<>();
+		}
+		if (endLectures == null || endLectures.isEmpty()) {
+			endLectures = new ArrayList<>();
+		}
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
-        return ResponseEntity.ok(responseBody);
-    }
+		// TeacherLecture 객체 생성 후 데이터 설정
+		TeacherLecture teacherLecture = new TeacherLecture();
+		teacherLecture.setDueToLecture(dueToLectures);
+		teacherLecture.setIngLecture(ingLectures);
+		teacherLecture.setEndLecture(endLectures);
 
-    @Override
-    public ResponseEntity<ResponseDto> getMyLecture(String user) {
-        Long memberUID = memberRepository.getMemberIdById(user);
+		return teacherLecture;
+	}
 
-        TeacherLecture results = getTeacherLectures(memberUID);
+	@Override
+	public ResponseEntity<ResponseDto> updateProfile(String user, UpdateMember member) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		String[] categories = member.getTags().split(",");
 
-        // 모든 강의 리스트가 비어 있으면 빈 데이터를 반환
-        if (results == null || (results.getDueToLecture().isEmpty() && results.getIngLecture().isEmpty()
-                && results.getEndLecture().isEmpty())) {
-            results = new TeacherLecture();
-            results.setDueToLecture(new ArrayList<>());
-            results.setIngLecture(new ArrayList<>());
-            results.setEndLecture(new ArrayList<>());
-        }
+		if(accountRepository.selectCount(memberUID) != 0) {
+			accountRepository.deleteCategory(memberUID);
+		}
+		for (String cat : categories) {						
+			accountRepository.insertCategory(memberUID, cat.trim());
+		}
+		
 
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, results);
-        return ResponseEntity.ok(responseBody);
-    }
+		String fileUrl = s3FileUploader.uploadFile(member.getFile(), "members", "profile", memberUID);
 
-    public TeacherLecture getTeacherLectures(Long teacherId) {
-        // 강의 상태별 데이터 조회
-        List<DueToLecture> dueToLectures = accountRepository.getDueToLectures(teacherId);
-        List<IngLecture> ingLectures = accountRepository.getIngLectures(teacherId);
-        List<EndLecture> endLectures = accountRepository.getEndLectures(teacherId);
+		try {
+			accountRepository.updateProfile(memberUID, fileUrl, member.getBirth(), member.getName(), member.getPhone(), member.getAttendId(), member.getTags());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
 
-        // 데이터가 없을 경우 빈 리스트 반환
-        if (dueToLectures == null || dueToLectures.isEmpty()) {
-            dueToLectures = new ArrayList<>();
-        }
-        if (ingLectures == null || ingLectures.isEmpty()) {
-            ingLectures = new ArrayList<>();
-        }
-        if (endLectures == null || endLectures.isEmpty()) {
-            endLectures = new ArrayList<>();
-        }
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
+	}
+	
+	@Override
+	public ResponseEntity<ResponseDto> insertCategory(String tags, String memberId) {
+		Long memberUID = memberRepository.getMemberIdById(memberId);
+		String[] categories = tags.split(",");
 
-        // TeacherLecture 객체 생성 후 데이터 설정
-        TeacherLecture teacherLecture = new TeacherLecture();
-        teacherLecture.setDueToLecture(dueToLectures);
-        teacherLecture.setIngLecture(ingLectures);
-        teacherLecture.setEndLecture(endLectures);
+		try {
+			for (String cat : categories) {
+				accountRepository.insertCategory(memberUID, cat.trim());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
 
-        return teacherLecture;
-    }
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
+	}
+
+
+	@Override
+	public ResponseEntity<ResponseDto> updateBank(String bank, String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		try {
+			accountRepository.updateBank(bank, memberUID);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);		
+	}
+
+
+	@Override
+	public ResponseEntity<ResponseDto> deleteBank(String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		try {
+			accountRepository.deleteBank(memberUID);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);		
+	}
+
+
+	@Override
+	public ResponseEntity<ResponseDto> addBank(String bank, String user) {
+		Long memberUID = memberRepository.getMemberIdById(user);
+		try {
+			accountRepository.addBank(bank, memberUID);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseDto.databaseError();
+		}
+
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
+		return ResponseEntity.ok(responseBody);
+	}
+
 }
-
