@@ -36,7 +36,7 @@
 	<![CDATA[
 		DELETE
 		FROM carts
-		WHERE member_id = #{memberId} AND cart_id = #{cartId}
+		WHERE member_id = #{memberUID} AND cart_id = #{cartId}
 	]]>
 	</delete>
 	
