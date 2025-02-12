@@ -7,6 +7,7 @@ import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
 import com.classpick.web.lecture.model.LectureList;
+import com.classpick.web.lecture.model.Tag;
 
 public interface ILectureService {
     Map<String, List<Lecture>> getAllLectures();
@@ -54,4 +55,6 @@ public interface ILectureService {
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 
     void insertLectureListByExcel(LectureList lectureList);
+
+    List<Tag> getTags();
 }

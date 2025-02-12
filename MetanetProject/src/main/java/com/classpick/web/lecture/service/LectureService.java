@@ -14,6 +14,7 @@ import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
 import com.classpick.web.lecture.model.LectureList;
+import com.classpick.web.lecture.model.Tag;
 
 @Service
 public class LectureService implements ILectureService {
@@ -170,6 +171,11 @@ public class LectureService implements ILectureService {
     @Override
     public void insertLectureListByExcel(LectureList lectureList) {
         lectureDao.insertLectureListByExcel(lectureList);
+    }
+
+    @Override
+    public List<Tag> getTags() {
+        return lectureDao.getTags();
     }
 
 }

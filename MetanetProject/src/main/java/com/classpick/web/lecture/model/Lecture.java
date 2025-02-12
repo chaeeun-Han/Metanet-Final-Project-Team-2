@@ -32,5 +32,7 @@ public class Lecture {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Boolean deleted;
+    private String link;
     private String tags;
+    private String code;
 }
