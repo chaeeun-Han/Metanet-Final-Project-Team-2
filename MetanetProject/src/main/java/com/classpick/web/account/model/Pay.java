@@ -11,4 +11,6 @@ public class Pay {
 	private int price;
 	private String startDate;
 	private String endDate;
+	private String title;
+	private String profile;
 }

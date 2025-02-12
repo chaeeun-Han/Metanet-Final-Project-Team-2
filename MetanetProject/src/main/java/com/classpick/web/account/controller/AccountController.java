@@ -2,6 +2,7 @@ package com.classpick.web.account.controller;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -9,15 +10,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.classpick.web.account.model.UpdateMember;
 import com.classpick.web.account.service.IAccountService;
 import com.classpick.web.common.response.ResponseCode;
 import com.classpick.web.common.response.ResponseDto;
@@ -27,6 +32,7 @@ import com.classpick.web.lecture.model.LectureRevenueDto;
 import com.classpick.web.lecture.model.MonthlySalesDto;
 import com.classpick.web.lecture.model.MonthlySalesResponse;
 import com.classpick.web.member.dao.IMemberRepository;
+import com.classpick.web.member.model.Member;
 import com.classpick.web.util.GetAuthenUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -159,17 +165,35 @@ public class AccountController {
 		return accountService.insertCategory(tags, user);
 	}
 	
-	// 프로필 수정 - 신영서
 	@PutMapping("/update")
-	public ResponseEntity<ResponseDto> updateProfile(@RequestParam("files") MultipartFile files){
-		String user = GetAuthenUser.getAuthenUser();
-		
-		if (user == null) {
-			return ResponseDto.noAuthentication();
-		}
-		
-		return accountService.updateProfile(user, files);
+	public ResponseEntity<ResponseDto> updateProfile(
+	        @RequestParam(value = "file", required = false) MultipartFile file,
+	        @RequestParam("name") String name,
+	        @RequestParam("phone") String phone,
+	        @RequestParam("birth") String birth,
+	        @RequestParam("attendId") String attendId,
+	        @RequestParam("tags") String tags) {
+	    
+	    // 인증된 사용자 가져오기
+	    String user = GetAuthenUser.getAuthenUser();
+	    if (user == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
+	    // UpdateMember 객체를 사용하여 서비스 호출
+	    UpdateMember member = new UpdateMember();
+	    member.setFile(file);
+	    member.setName(name);
+	    member.setPhone(phone);
+	    member.setBirth(birth);
+	    member.setAttendId(attendId);
+	    member.setTags(tags);
+	    
+	    // 수정된 값으로 서비스 호출
+	    return accountService.updateProfile(user, member);
 	}
+
+
 	
 	
 	// 프로필 조회 - 신영서	
@@ -223,6 +247,43 @@ public class AccountController {
 		return accountService.getMyLecture(user);		
 	}
 	
+	@PutMapping("/edit-bank")
+	public ResponseEntity<ResponseDto> updateBank(@RequestBody Member member) {
+	   
+	    String user = GetAuthenUser.getAuthenUser();
+	    
+	    if (user == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
+	    return accountService.updateBank(member.getBank(), user);        
+	}
+	
+
+	@DeleteMapping("/delete-bank")
+	public ResponseEntity<ResponseDto> deleteBank() {
+	   
+	    String user = GetAuthenUser.getAuthenUser();
+	    
+	    if (user == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
+	    return accountService.deleteBank(user);        
+	}
+	
+	@PostMapping("/add-bank")
+	public ResponseEntity<ResponseDto> addeBank(@RequestBody Member member) {
+	   
+	    String user = GetAuthenUser.getAuthenUser();
+	    
+	    if (user == null) {
+	        return ResponseDto.noAuthentication();
+	    }
+	    
+	    return accountService.addBank(member.getBank(), user);        
+	}
+
 	
 	
 }	

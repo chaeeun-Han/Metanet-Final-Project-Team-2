@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.classpick.web.common.response.ResponseDto;
 import com.classpick.web.member.model.Email;
 import com.classpick.web.member.service.IMemberService;
+import com.classpick.web.util.RegexUtil;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,9 @@ public class EmailController {
 
 	@Autowired
 	IMemberService memberService;
+	
+	private final RegexUtil regexUtil = new RegexUtil();
+			
 
 	// 회원가입 인증코드 메일 발송
 	@PostMapping("/send")
@@ -54,11 +58,10 @@ public class EmailController {
 	// 이메일 변경 인증번호
 	@PostMapping("/mail-email")
 	public ResponseEntity<ResponseDto> mailEmail(@RequestBody Email email) throws MessagingException {
-
-		if (memberService.findByEmail(email.getEmail()) == false) {
-			return ResponseDto.notExistEmail();
+		// 이메일 검증
+		if (email.getEmail() != null && !regexUtil.checkEmail(email.getEmail())) {
+			return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Email value not match Regex"));
 		}
-
 		ResponseEntity<ResponseDto> response = memberService.sendEmail("email", email.getEmail());
 
 		return response;
