@@ -33,4 +33,5 @@ public class Lecture {
     private LocalDateTime endDate;
     private Boolean deleted;
     private String tags;
+    private String teacher;
 }
