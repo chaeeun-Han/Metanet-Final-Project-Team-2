@@ -74,13 +74,14 @@ public class ExcelController {
                 String start_time = formatter.formatCellValue(row.getCell(3));
                 String end_time = formatter.formatCellValue(row.getCell(4));
 
-                list.setLecture_id(lectureId);
-                list.setMember_id(memberId);
+                list.setLectureId(lectureId);
+                list.setMemberId(memberId);
 
-                list.setTitle(title + " - " + (i - 1) + " 일차");
+                list.setTitle(title);
                 list.setDescription(description);
-                list.setStart_time(date + "T" + start_time + ":00");
-                list.setEnd_time(date + "T" + end_time + ":00");
+                list.setDate(date);
+                list.setStartTime(start_time);
+                list.setEndTime(end_time);
 
                 lectureService.insertLectureListByExcel(list);
             }
@@ -105,7 +106,6 @@ public class ExcelController {
             if (memberList.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            
 
             String title = memberList.get(0).getTitle().replaceAll("[\\\\/:*?\"<>|]", "");
             String fileName = title + "_학생목록.xlsx";

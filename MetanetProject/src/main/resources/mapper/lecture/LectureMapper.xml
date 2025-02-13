@@ -37,6 +37,22 @@
 	]]>
 	</select>
 
+    <select id="getLectureLists" parameterType="Long" resultType="com.classpick.web.lecture.model.LectureList" >
+        <![CDATA[
+            SELECT k.name, title, description, start_time AS startTime, end_time AS endTime
+            FROM lecture_lists i
+            JOIN members k on i.member_id = k.member_id
+            WHERE lecture_id = #{lectureId}
+        ]]>
+    </select>
+
+    <select id="getTags" resultType="com.classpick.web.lecture.model.Tag">
+    <![CDATA[
+        SELECT tag_id , tag_name 
+        FROM tags
+    ]]>
+    </select>
+
     <select id="getRankByDeadDateLectures" resultType="com.classpick.web.lecture.model.Lecture">
 	<![CDATA[
         SELECT 
@@ -66,7 +82,7 @@
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
-        ORDER BY l.deadline_time ASC
+        ORDER BY l.deadline_time DESC
         LIMIT 5;
 	]]>
 	</select>
@@ -100,7 +116,7 @@
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
-        ORDER BY l.likes ASC
+        ORDER BY l.likes DESC
         LIMIT 5;
     ]]>
     </select>
@@ -375,13 +391,13 @@
 	]]>	
 	</select>
 
-    <insert id="insertLectureListByExcel" parameterType="com.classpick.web.lecture.model.LectureList">
+    <insert id="insertLectureListByExcel" parameterType="com.classpick.web.lecture.model.LectureList" useGeneratedKeys="true" keyProperty="lectureListId">
     <![CDATA[
         INSERT
             INTO lecture_lists
             (lecture_id, member_id, title, description, start_time, end_time)
             VALUES
-            (#{lecture_id}, #{member_id}, #{title}, #{description}, #{start_time}, #{end_time})
+            (#{lectureId}, #{memberId}, #{title}, #{description}, #{startTime}, #{endTime})
     ]]>
     </insert>
 	
