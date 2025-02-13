@@ -59,9 +59,11 @@ public class SecurityConfig {
 	            .requestMatchers("/topic/**", "/queue/**").permitAll()
 	            .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
 	            .requestMatchers("/zoom/*").permitAll()
-	            .requestMatchers("/error", "/favicon.ico").permitAll()
-				.anyRequest().authenticated() // 모든 요청은 인증이 필요
-		);
+	            .requestMatchers("/favicon.ico").permitAll()
+	            .anyRequest().authenticated()
+			    )
+			    .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
+			    
 
 		// JWT 인증을 위해 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
 		http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
