@@ -222,6 +222,57 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- 테스트 커버리지 측정을 위한 플러그인 -->
+			<plugin>
+			    <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			    <version>0.8.12</version>
+			    <executions>
+			        <execution>
+			            <id>prepare-agent</id>
+			            <goals>
+			                <goal>prepare-agent</goal>
+			            </goals>
+			        </execution>
+			        <execution>
+			            <id>report</id>
+			            <phase>verify</phase>
+			            <goals>
+			                <goal>report</goal>
+			            </goals>
+			            <configuration>
+			            	<excludes>
+			            		<exclude>**/model/**</exclude>
+			            		<exclude>**/lombok/**</exclude>
+			            		<exclude>**/config/**</exclude>
+			            		<exclude>**/common/**</exclude>
+			            		<exclude>**/util/**</exclude>
+			            		<exclude>**/aop/**</exclude>
+			            	</excludes>
+			            </configuration>
+			        </execution>
+			        <execution>
+			            <id>check</id>
+			            <goals>
+			                <goal>check</goal>
+			            </goals>
+			            <configuration>
+			                <rules>
+			                    <rule>
+			                        <element>BUNDLE</element>
+			                        <limits>
+			                            <limit>
+			                                <counter>LINE</counter>
+			                                <value>COVEREDRATIO</value>
+			                                <minimum>0.80</minimum>
+			                            </limit>
+			                        </limits>
+			                    </rule>
+			                </rules>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 		</plugins>
 	</build>
 
