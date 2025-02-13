@@ -14,6 +14,6 @@ public class Log {
 	private int responseStatus;
 	private String clientIp;
 	private LocalDateTime requestTime;
-	private LocalDateTime responseTime;
+	private Long executionTime;
 	private String serviceName;
 }
