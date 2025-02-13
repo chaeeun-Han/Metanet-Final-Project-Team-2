@@ -1,13 +1,20 @@
 package com.classpick.web.lecture.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.classpick.web.lecture.dao.ILectureRepository;
 import com.classpick.web.lecture.model.Lecture;
@@ -176,6 +183,51 @@ public class LectureService implements ILectureService {
     @Override
     public List<Tag> getTags() {
         return lectureDao.getTags();
+    }
+
+    @Override
+    public List<LectureList> getLectureLists(Long lectureId) {
+        return lectureDao.getLectureLists(lectureId);
+    }
+
+    @Override
+    public List<LectureList> getLectureListByExcel(MultipartFile excelFile, Long lectureId, Long memberId) {
+        List<LectureList> lectureLists = new ArrayList<LectureList>();
+        try (XSSFWorkbook excel = new XSSFWorkbook(excelFile.getInputStream())) {
+            XSSFSheet workSheet = excel.getSheetAt(0);
+
+            for (int i = 2; i < workSheet.getPhysicalNumberOfRows(); i++) {
+                LectureList list = new LectureList();
+
+                DataFormatter formatter = new DataFormatter();
+                XSSFRow row = workSheet.getRow(i);
+
+                String title = formatter.formatCellValue(row.getCell(0));
+                String description = formatter.formatCellValue(row.getCell(1));
+                String date = formatter.formatCellValue(row.getCell(2));
+                String start_time = formatter.formatCellValue(row.getCell(3));
+                String end_time = formatter.formatCellValue(row.getCell(4));
+
+                list.setLectureId(lectureId);
+                list.setMemberId(memberId);
+
+                list.setTitle(title);
+                list.setDescription(description);
+                list.setDate(date);
+                list.setStartTime(start_time);
+                list.setEndTime(end_time);
+
+                if (!list.getTitle().isEmpty() && !list.getDescription().isEmpty() && !list.getDate().isEmpty()
+                        && !list.getStartTime().isEmpty() && !list.getEndTime().isEmpty()) {
+                    lectureLists.add(list);
+                }
+            }
+
+            return lectureLists;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return lectureLists;
+        }
     }
 
 }

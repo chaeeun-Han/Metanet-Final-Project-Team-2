@@ -15,6 +15,7 @@ public class Lecture {
     private Long lectureId;
     private Long memberId;
     private String title;
+    private String teacher;
     private String profile;
     private String profileUrl;
     private String description;
@@ -35,5 +36,4 @@ public class Lecture {
     private String link;
     private String tags;
     private String code;
-    private String teacher;
 }

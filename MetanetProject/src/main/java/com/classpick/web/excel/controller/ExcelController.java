@@ -77,10 +77,11 @@ public class ExcelController {
                 list.setLectureId(lectureId);
                 list.setMemberId(memberId);
 
-                list.setTitle(title + " - " + (i - 1) + " 일차");
+                list.setTitle(title);
                 list.setDescription(description);
-                list.setStartTime(date + "T" + start_time + ":00");
-                list.setEndTime(date + "T" + end_time + ":00");
+                list.setDate(date);
+                list.setStartTime(start_time);
+                list.setEndTime(end_time);
 
                 lectureService.insertLectureListByExcel(list);
             }

@@ -3,6 +3,8 @@ package com.classpick.web.lecture.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
@@ -57,4 +59,8 @@ public interface ILectureService {
     void insertLectureListByExcel(LectureList lectureList);
 
     List<Tag> getTags();
+
+    List<LectureList> getLectureLists(Long lectureId);
+
+    List<LectureList> getLectureListByExcel(MultipartFile excelFile, Long lectureId, Long memberId);
 }

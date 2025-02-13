@@ -104,6 +104,20 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
+    // 특정 강의 강의 일정 조회 -- 고범준
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @GetMapping("/lectureLists/{lecture_id}")
+    public ResponseEntity<ResponseDto> getLectureLists(@PathVariable("lecture_id") Long lectureId) {
+        List<LectureList> lectureLists = new ArrayList<LectureList>();
+        try {
+            lectureLists = lectureService.getLectureLists(lectureId);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lectureLists);
+        return ResponseEntity.ok(responseBody);
+    }
+
     // 좋아요 누른 강의 목록 보기 -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PostMapping("/likes/{lecture_id}")
@@ -218,19 +232,21 @@ public class LectureRestController {
     // 강의 추가 form-Data -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto> lecturelikeLectures(@ModelAttribute Lecture lecture,
+    public ResponseEntity<ResponseDto> lecturelikeLectures(
+            @ModelAttribute Lecture lecture,
             @RequestParam(value = "profileFile", required = false) MultipartFile profileFile,
-            @RequestPart(value = "lists", required = true) List<LectureList> lists,
+            @RequestPart(value = "lists", required = false) List<LectureList> lists,
+            @RequestParam(value = "excelFile", required = false) MultipartFile excelFile,
             @RequestParam(value = "descriptionPicFile", required = false) MultipartFile descriptionPicFile) {
+
         String memberId = GetAuthenUser.getAuthenUser();
-        // 인증되지 않은 경우는 바로 처리
         if (memberId == null) {
             return ResponseDto.noAuthentication();
         }
-
         Long member_id = lectureService.getMemberIdById(memberId);
 
         try {
+            // lecture 값 검증
             lecture.setMemberId(member_id);
             if (lecture.getTitle() == null || lecture.getTitle().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Title value is required"));
@@ -261,8 +277,9 @@ public class LectureRestController {
                 lectureService.updateLectureTags(lectureId, lecture.getTags());
             }
 
+            // 프로필 파일 업로드
             if (profileFile != null && !profileFile.isEmpty()) {
-                String url = new String();
+                String url;
                 try {
                     url = s3FileUploader.uploadFile(profileFile, "lectures", "profile", lectureId);
                     lecture.setProfileUrl(url);
@@ -270,42 +287,49 @@ public class LectureRestController {
                     e.printStackTrace();
                     return ResponseDto.serverError();
                 }
-                lecture.setProfileUrl(url);
             }
+            // 설명 파일 업로드
             if (descriptionPicFile != null && !descriptionPicFile.isEmpty()) {
-                String url = new String();
+                String url;
                 try {
-                    url = s3FileUploader.uploadFile(descriptionPicFile, "lectures", "description",
-                            lectureId);
+                    url = s3FileUploader.uploadFile(descriptionPicFile, "lectures", "description", lectureId);
                     lecture.setDescriptionPicUrl(url);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return ResponseDto.serverError();
                 }
-                lecture.setDescriptionPicUrl(url);
             }
 
             lectureService.updateLectures(lecture);
 
-            // zoom 토큰 발급
-
             zoomService.requestZoomAccessToken(lecture.getCode(), memberId);
 
-            List<ZoomDate> zoomdates = new ArrayList<ZoomDate>();
+            List<LectureList> lectureLists = new ArrayList<>();
+            if (excelFile != null && !excelFile.isEmpty()) {
+
+                lectureLists = lectureService.getLectureListByExcel(excelFile, lectureId, member_id);
+            } else if (lists != null && !lists.isEmpty()) {
+
+                lectureLists = lists;
+            } else {
+
+                return ResponseEntity.badRequest().body(new ResponseDto("DATA_ERROR", "No lecture schedule provided"));
+            }
+
+            List<ZoomDate> zoomdates = new ArrayList<>();
             ZoomMeetingRequest zoomRequest = new ZoomMeetingRequest();
 
-            for (LectureList lectureList : lists) {
+            for (LectureList lectureList : lectureLists) {
                 LectureList lectureData = new LectureList();
-                lectureData.setDate(lectureList.getDate());
-                lectureData.setStartTime(lectureList.getStartTime());
-                lectureData.setEndTime(lectureList.getEndTime());
                 lectureData.setLectureId(lectureId);
                 lectureData.setMemberId(member_id);
                 lectureData.setTitle(lectureList.getTitle());
                 lectureData.setDescription(lectureList.getDescription());
                 lectureData.setStartTime(lectureList.getDate() + "T" + lectureList.getStartTime() + ":00");
                 lectureData.setEndTime(lectureList.getDate() + "T" + lectureList.getEndTime() + ":00");
+
                 lectureService.insertLectureListByExcel(lectureData);
+
                 ZoomDate zoomDate = new ZoomDate();
                 zoomDate.setLectureListId(lectureData.getLectureListId());
                 zoomDate.setDate(LocalDate.parse(lectureList.getDate()));
@@ -315,7 +339,6 @@ public class LectureRestController {
             }
 
             zoomRequest.setZoomDates(zoomdates);
-
             zoomService.createMeeting(member_id, zoomRequest);
 
         } catch (Exception e) {

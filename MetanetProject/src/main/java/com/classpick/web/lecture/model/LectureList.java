@@ -16,4 +16,5 @@ public class LectureList {
     private String endTime;
     private String link;
     private int meetingId;
+    private String name;
 }

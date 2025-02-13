@@ -83,4 +83,6 @@ public interface ILectureRepository {
     void updateMeetingInfo(@Param("list") List<ZoomMeetingResponse> responses);
 
     List<Tag> getTags();
+
+    List<LectureList> getLectureLists(Long lectureId);
 }
