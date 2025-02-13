@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LogAspect {
    
    private final IAopRepository aopRepository;
-   private final ObjectMapper objectMapper = new ObjectMapper(); 
    
    @Around("execution(* com.classpick.web..*Service.*(..))")
    public Object logServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -47,26 +46,19 @@ public class LogAspect {
         Object result;
         long startTime = System.currentTimeMillis();
         long executionTime;
-        int responseStatus = 0;
-        String returnValue = "null";
         
         try {
             result = joinPoint.proceed();
             executionTime = System.currentTimeMillis() - startTime;
-            
+
             log.info("[[[AOP-after log]]]-{}: Method executed successfully", methodName);
-            
-            if (result instanceof Optional<?> optionalResult) {
-                result = optionalResult.orElse(null);
-            }
-            if (result instanceof ResponseEntity<?> responseEntity) {
-                responseStatus = responseEntity.getStatusCode().value();
-            }
+
         } catch (Throwable throwable) {
             executionTime = System.currentTimeMillis() - startTime;
             log.error("[[[AOP-exception log]]]-{}: Exception occurred: {}", methodName, throwable.getMessage());
             throw throwable;
         }
+
         
         Log logEntry = new Log();
         logEntry.setRequestUrl(url);
@@ -74,7 +66,6 @@ public class LogAspect {
         logEntry.setClientIp(clientIp);
         logEntry.setRequestTime(requestTime);
         logEntry.setExecutionTime(executionTime);
-        logEntry.setResponseStatus(responseStatus);
         logEntry.setServiceName(className + "." + methodName);
 
         log.info("Log : {}", logEntry);

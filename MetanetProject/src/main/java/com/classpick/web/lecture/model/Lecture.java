@@ -35,4 +35,5 @@ public class Lecture {
     private String link;
     private String tags;
     private String code;
+    private String teacher;
 }
