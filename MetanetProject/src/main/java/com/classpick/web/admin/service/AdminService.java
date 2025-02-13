@@ -7,11 +7,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.classpick.web.admin.model.AdminDashboard;
+import com.classpick.web.admin.model.LectureDashboard;
+import com.classpick.web.admin.model.MemDashboard;
+import com.classpick.web.admin.model.PercentDashboard;
+import com.classpick.web.admin.model.StudentTeacherDashboard;
 import com.classpick.web.common.response.ResponseCode;
 import com.classpick.web.common.response.ResponseDto;
 import com.classpick.web.common.response.ResponseMessage;
 import com.classpick.web.lecture.dao.ILectureRepository;
 import com.classpick.web.lecture.model.DeleteLectureRequest;
+import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.member.dao.IMemberRepository;
 import com.classpick.web.member.model.DeleteMemberRequest;
 import com.classpick.web.member.model.MemberResponse;
@@ -91,6 +97,33 @@ public class AdminService implements IAdminService{
 		}		
 		return ResponseDto.success();
 	}
+
+	@Override
+	public ResponseEntity<ResponseDto> getAllLectures() {
+		List<Lecture> lectures = lectureRepository.getAllLecture();
+		ResponseDto<List<Lecture>> responseBody = new ResponseDto<List<Lecture>>(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lectures);
+		return ResponseEntity.ok(responseBody);
+	}
+
+	@Override
+	public ResponseEntity<ResponseDto> getDashboard() {
+		
+		List<MemDashboard> memDashboard = memberRepository.getMemDashboard();
+		List<LectureDashboard> lectureDashboard = lectureRepository.getLectureDashboard();
+		List<PercentDashboard> percentDashboard = lectureRepository.getPercentDashboard();
+		List<StudentTeacherDashboard> studentteacherDashboard = memberRepository.getStudentTeacherDashboard();
+		AdminDashboard adminDashboard = new AdminDashboard();
+		adminDashboard.setMemDashboard(memDashboard);
+		adminDashboard.setLectureDashboard(lectureDashboard);
+		adminDashboard.setPercentDashboard(percentDashboard);
+		adminDashboard.setStudentteacherDashboard(studentteacherDashboard);
+		
+		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, adminDashboard);
+		
+		return ResponseEntity.ok(responseBody);
+	}
 	
+	
+
 
 }

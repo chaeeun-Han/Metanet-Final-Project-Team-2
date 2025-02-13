@@ -130,4 +130,49 @@ public class AdminController {
 		ResponseEntity<ResponseDto> response = adminService.deleteAllLectures();
 		return response;
 	}
+	
+	
+	@GetMapping("/lectures")
+	public ResponseEntity<ResponseDto> getAllLectures(){
+		String memberId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+        try {
+            if (authentication != null) {
+                // 현재 인증된 사용자 정보
+                memberId = authentication.getName();
+            }
+
+            if (memberId == null)
+                return ResponseDto.noAuthentication();
+        } catch (Exception exception) {
+            log.info(exception.getMessage());
+            return ResponseDto.databaseError();
+        }
+        
+		ResponseEntity<ResponseDto> response = adminService.getAllLectures();
+		return response;
+	}
+	
+	@GetMapping("/dashboard")
+	public ResponseEntity<ResponseDto> getDashboard(){
+		String memberId = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+        try {
+            if (authentication != null) {
+                // 현재 인증된 사용자 정보
+                memberId = authentication.getName();
+            }
+
+            if (memberId == null)
+                return ResponseDto.noAuthentication();
+        } catch (Exception exception) {
+            log.info(exception.getMessage());
+            return ResponseDto.databaseError();
+        }
+        
+		ResponseEntity<ResponseDto> response = adminService.getDashboard();
+		return response;
+	}
 }

@@ -16,4 +16,5 @@ public class AccountLecture {
 	private String profile;		
 	//attends의 is_coursable
 	private boolean isCoursable;
+	private Long lectureId;
 }

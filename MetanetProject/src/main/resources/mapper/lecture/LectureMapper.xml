@@ -404,4 +404,41 @@
 	    </foreach>
 	</update>
 	
+	<select id="getAllLecture">
+		SELECT lecture_id as lectureId, title as title, category as category,deleted as deleted, start_date as startDate, end_date as endDate
+		FROM lectures	
+		order by lecture_id asc;	
+	</select>
+	
+	<select id="getLectureDashboard" resultType="com.classpick.web.admin.model.LectureDashboard">
+	    SELECT 
+	        CASE 
+	            WHEN price BETWEEN 10000 AND 19999 THEN '1만원대'
+	            WHEN price BETWEEN 20000 AND 29999 THEN '2만원대'
+	            WHEN price BETWEEN 30000 AND 39999 THEN '3만원대'
+	            WHEN price BETWEEN 40000 AND 49999 THEN '4만원대'
+	            WHEN price BETWEEN 50000 AND 59999 THEN '5만원대'
+	            ELSE '기타'
+	        END AS price,
+	        COUNT(*) AS lecNum
+	    FROM lectures
+	    WHERE deleted = FALSE  
+	    GROUP BY price
+	    ORDER BY price;
+	</select>
+
+	<select id="getPercentDashboard"  resultType="com.classpick.web.admin.model.PercentDashboard">
+		SELECT 
+		    DATE_FORMAT(start_date, '%Y-%m') AS date,  
+		    SUM(price * 0.1) AS payPercent 
+		FROM 
+		    lectures
+		WHERE 
+		    deleted = FALSE
+		    AND start_date >= CURDATE() - INTERVAL 6 MONTH 
+		GROUP BY 
+		    DATE_FORMAT(start_date, '%Y-%m')  
+		ORDER BY 
+		    date ASC;  
+	</select>
 </mapper>
