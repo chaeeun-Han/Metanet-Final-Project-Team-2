@@ -3,10 +3,13 @@ package com.classpick.web.lecture.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
 import com.classpick.web.lecture.model.LectureList;
+import com.classpick.web.lecture.model.Tag;
 
 public interface ILectureService {
     Map<String, List<Lecture>> getAllLectures();
@@ -54,4 +57,10 @@ public interface ILectureService {
     Boolean checkBeforeBuyLecture(Map<String, Long> params);
 
     void insertLectureListByExcel(LectureList lectureList);
+
+    List<Tag> getTags();
+
+    List<LectureList> getLectureLists(Long lectureId);
+
+    List<LectureList> getLectureListByExcel(MultipartFile excelFile, Long lectureId, Long memberId);
 }

@@ -11,9 +11,8 @@ public class Log {
 	private Long logId;
 	private String requestUrl;
 	private String requestMethod;
-	private int responseStatus;
 	private String clientIp;
 	private LocalDateTime requestTime;
-	private LocalDateTime responseTime;
+	private Long executionTime;
 	private String serviceName;
 }
