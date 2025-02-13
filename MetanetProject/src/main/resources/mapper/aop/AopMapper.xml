@@ -11,7 +11,7 @@
             response_status,
             client_ip,
             request_time,
-            response_time,
+            execution_time,
             service_name
 		) VALUES (
 			#{requestUrl},
@@ -19,7 +19,7 @@
             #{responseStatus},
             #{clientIp},
             #{requestTime},
-            #{responseTime},
+            #{executionTime},
             #{serviceName}
 		)
 	</insert>
