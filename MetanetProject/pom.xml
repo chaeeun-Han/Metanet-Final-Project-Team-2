@@ -248,6 +248,8 @@
 			            		<exclude>**/common/**</exclude>
 			            		<exclude>**/util/**</exclude>
 			            		<exclude>**/aop/**</exclude>
+			            		<exclude>**/controller/**</exclude>
+			            		<exclude>**/dao/**</exclude>
 			            	</excludes>
 			            </configuration>
 			        </execution>
