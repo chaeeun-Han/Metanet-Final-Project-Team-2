@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +32,7 @@ import com.classpick.web.util.RedisUtil;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,19 +46,27 @@ public class MemberService implements IMemberService {
 	private static final String senderEmail = "neighclova@gmail.com";
 
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
-	private final JwtTokenProvider jwtTokenProvider;
 
-	@Autowired
 	private final RedisTokenService redisTokenService;
 
-	@Autowired
-	IMemberRepository memberRepository;
+	private final IMemberRepository memberRepository;
 
-	@Autowired
-	IAccountRepository accountRepository;
+	private final IAccountRepository accountRepository;
 	
-	@Autowired
-	JwtTokenProvider jwtProvider;
+	private final JwtTokenProvider jwtProvider;
+	
+    public MemberService(JavaMailSender javaMailSender, RedisUtil redisUtil, 
+            AuthenticationManagerBuilder authenticationManagerBuilder, 
+            JwtTokenProvider jwtTokenProvider, RedisTokenService redisTokenService, 
+            IMemberRepository memberRepository, IAccountRepository accountRepository) {
+				this.javaMailSender = javaMailSender;
+				this.redisUtil = redisUtil;
+				this.authenticationManagerBuilder = authenticationManagerBuilder;
+				this.jwtProvider = jwtTokenProvider;
+				this.redisTokenService = redisTokenService;
+				this.memberRepository = memberRepository;
+				this.accountRepository = accountRepository;
+			}
 
 	@Override
 	public void insertMember(Member member) {
@@ -208,7 +216,7 @@ public class MemberService implements IMemberService {
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
 		// 3. 인증 정보를 기반으로 JWT 토큰 생성
-		JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+		JwtToken jwtToken = jwtProvider.generateToken(authentication);
 
 		// 4. 리프레시 토큰 redis에 저장
 		String refreshToken = jwtToken.getRefreshToken(); // 리프레시 토큰
