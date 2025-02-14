@@ -5,14 +5,11 @@
 <mapper namespace="com.classpick.web.cart.dao.ICartRepository">
 
 	<insert id="addCart">
-	<![CDATA[
 	    INSERT INTO carts (lecture_id, member_id)
-	    SELECT #{lectureId}, #{memberId}
-	    WHERE NOT EXISTS (
-	        SELECT 1 FROM carts WHERE lecture_id = #{lectureId} AND member_id = #{memberId}
-	    )
-	]]>
+	    VALUES (#{lectureId}, #{memberUID})
+	    ON DUPLICATE KEY UPDATE member_id = member_id
 	</insert>
+
 	
 	<select id="getCarts" resultType="com.classpick.web.cart.model.Cart">
 	    SELECT 

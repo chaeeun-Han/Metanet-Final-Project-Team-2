@@ -16,6 +16,7 @@ import com.classpick.web.lecture.model.LectureList;
 import com.classpick.web.lecture.model.LectureReminderDto;
 import com.classpick.web.lecture.model.LectureRevenueDto;
 import com.classpick.web.lecture.model.LectureScheduled;
+import com.classpick.web.lecture.model.Tag;
 import com.classpick.web.zoom.model.ZoomMeetingResponse;
 
 @Repository
@@ -80,12 +81,16 @@ public interface ILectureRepository {
     List<LectureReminderDto> getLecturesStartingIn30Minutes();
 
     void insertLectureListByExcel(LectureList lectureList);
-    
+
     void updateMeetingInfo(@Param("list") List<ZoomMeetingResponse> responses);
 
-	List<Lecture> getAllLecture();
+	  List<Lecture> getAllLecture();
 
-	List<LectureDashboard> getLectureDashboard();
+	  List<LectureDashboard> getLectureDashboard();
 
-	List<PercentDashboard> getPercentDashboard();
+    List<PercentDashboard> getPercentDashboard();
+
+    List<Tag> getTags();
+
+    List<LectureList> getLectureLists(Long lectureId);
 }

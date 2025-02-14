@@ -1,5 +1,7 @@
 package com.classpick.web.lecture.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +21,15 @@ import com.classpick.web.common.response.ResponseMessage;
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
+import com.classpick.web.lecture.model.LectureList;
+import com.classpick.web.lecture.model.Tag;
 import com.classpick.web.lecture.service.ILectureService;
 import com.classpick.web.util.GetAuthenUser;
 import com.classpick.web.util.RegexUtil;
 import com.classpick.web.util.S3FileUploader;
+import com.classpick.web.zoom.model.ZoomDate;
+import com.classpick.web.zoom.model.ZoomMeetingRequest;
+import com.classpick.web.zoom.service.ZoomService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +40,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,6 +56,9 @@ public class LectureRestController {
     @Autowired
     S3FileUploader s3FileUploader;
 
+    @Autowired
+    ZoomService zoomService;
+
     // 전체 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @GetMapping("/all")
@@ -60,6 +71,21 @@ public class LectureRestController {
             return ResponseDto.databaseError();
         }
         ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lecture);
+        return ResponseEntity.ok(responseBody);
+    }
+
+    // 태그들 조회회 -- 고범준
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @GetMapping("/get-tags")
+    public ResponseEntity<ResponseDto> getTags() {
+        List<Tag> tags = new ArrayList<Tag>();
+
+        try {
+            tags = lectureService.getTags();
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, tags);
         return ResponseEntity.ok(responseBody);
     }
 
@@ -78,17 +104,31 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
+    // 특정 강의 강의 일정 조회 -- 고범준
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @GetMapping("/lectureLists/{lecture_id}")
+    public ResponseEntity<ResponseDto> getLectureLists(@PathVariable("lecture_id") Long lectureId) {
+        List<LectureList> lectureLists = new ArrayList<LectureList>();
+        try {
+            lectureLists = lectureService.getLectureLists(lectureId);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
+        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, lectureLists);
+        return ResponseEntity.ok(responseBody);
+    }
+
     // 좋아요 누른 강의 목록 보기 -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PostMapping("/likes/{lecture_id}")
     public ResponseEntity<ResponseDto> likeLectures(@PathVariable("lecture_id") Long lectureId) {
 
-    	String member_id =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (member_id == null) {
-	        return ResponseDto.noAuthentication();
-	    }
-	    
+        String member_id = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (member_id == null) {
+            return ResponseDto.noAuthentication();
+        }
+
         Long memberId = lectureService.getMemberIdById(member_id);
 
         boolean exist = lectureService.checkLikeLectures(memberId, lectureId);
@@ -113,11 +153,11 @@ public class LectureRestController {
             @PathVariable("lecture_id") Long lectureId,
             @RequestParam("files") List<MultipartFile> files) {
 
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
 
         Long member_id = lectureService.getMemberIdById(memberId);
 
@@ -172,11 +212,11 @@ public class LectureRestController {
     @SuppressWarnings({ "rawtypes" })
     @PutMapping("/{lecture_id}/refund-status")
     public ResponseEntity<ResponseDto> setRefundStatus(@PathVariable("lecture_id") Long lectureId) {
-        String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
         Long member_id = lectureService.getMemberIdById(memberId);
 
         LectureId ids = new LectureId(member_id, lectureId);
@@ -192,17 +232,21 @@ public class LectureRestController {
     // 강의 추가 form-Data -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseDto> lecturelikeLectures(@ModelAttribute Lecture lecture,
+    public ResponseEntity<ResponseDto> lecturelikeLectures(
+            @ModelAttribute Lecture lecture,
             @RequestParam(value = "profileFile", required = false) MultipartFile profileFile,
+            @RequestPart(value = "lists", required = false) List<LectureList> lists,
+            @RequestParam(value = "excelFile", required = false) MultipartFile excelFile,
             @RequestParam(value = "descriptionPicFile", required = false) MultipartFile descriptionPicFile) {
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
 
+        String memberId = GetAuthenUser.getAuthenUser();
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
         Long member_id = lectureService.getMemberIdById(memberId);
+
         try {
+            // lecture 값 검증
             lecture.setMemberId(member_id);
             if (lecture.getTitle() == null || lecture.getTitle().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "Title value is required"));
@@ -223,37 +267,82 @@ public class LectureRestController {
             if (lecture.getEndDate() == null) {
                 return ResponseEntity.badRequest().body(new ResponseDto("REGEX_ERROR", "End date is required"));
             }
+            lecture.setLink("null");
 
             // 강의 생성
-            Long lectureId = lectureService.registerLectures(lecture);
+            lectureService.registerLectures(lecture);
+            Long lectureId = lecture.getLectureId();
             // 강의 생성 후 태그 생성
             if (lecture.getTags() != null && !lecture.getTags().isEmpty()) {
-                lectureService.updateLectureTags(lecture.getLectureId(), lecture.getTags());
+                lectureService.updateLectureTags(lectureId, lecture.getTags());
             }
 
+            // 프로필 파일 업로드
             if (profileFile != null && !profileFile.isEmpty()) {
-                String url = new String();
+                String url;
                 try {
-                    url = s3FileUploader.uploadFile(profileFile, "lectures", "profile", lecture.getLectureId());
+                    url = s3FileUploader.uploadFile(profileFile, "lectures", "profile", lectureId);
                     lecture.setProfileUrl(url);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return ResponseDto.serverError();
                 }
-                lecture.setProfileUrl(url);
             }
+            // 설명 파일 업로드
             if (descriptionPicFile != null && !descriptionPicFile.isEmpty()) {
-                String url = new String();
+                String url;
                 try {
-                    url = s3FileUploader.uploadFile(descriptionPicFile, "lectures", "description",
-                            lecture.getLectureId());
+                    url = s3FileUploader.uploadFile(descriptionPicFile, "lectures", "description", lectureId);
                     lecture.setDescriptionPicUrl(url);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return ResponseDto.serverError();
                 }
-                lecture.setDescriptionPicUrl(url);
             }
+
             lectureService.updateLectures(lecture);
+
+            zoomService.requestZoomAccessToken(lecture.getCode(), memberId);
+
+            List<LectureList> lectureLists = new ArrayList<>();
+            if (excelFile != null && !excelFile.isEmpty()) {
+
+                lectureLists = lectureService.getLectureListByExcel(excelFile, lectureId, member_id);
+            } else if (lists != null && !lists.isEmpty()) {
+
+                lectureLists = lists;
+            } else {
+
+                return ResponseEntity.badRequest().body(new ResponseDto("DATA_ERROR", "No lecture schedule provided"));
+            }
+
+            List<ZoomDate> zoomdates = new ArrayList<>();
+            ZoomMeetingRequest zoomRequest = new ZoomMeetingRequest();
+
+            for (LectureList lectureList : lectureLists) {
+                LectureList lectureData = new LectureList();
+                lectureData.setLectureId(lectureId);
+                lectureData.setMemberId(member_id);
+                lectureData.setTitle(lectureList.getTitle());
+                lectureData.setDescription(lectureList.getDescription());
+                lectureData.setStartTime(lectureList.getDate() + "T" + lectureList.getStartTime() + ":00");
+                lectureData.setEndTime(lectureList.getDate() + "T" + lectureList.getEndTime() + ":00");
+
+                lectureService.insertLectureListByExcel(lectureData);
+
+                ZoomDate zoomDate = new ZoomDate();
+                zoomDate.setLectureListId(lectureData.getLectureListId());
+                zoomDate.setDate(LocalDate.parse(lectureList.getDate()));
+                zoomDate.setStartTime(LocalTime.parse(lectureList.getStartTime()));
+                zoomDate.setEndTime(LocalTime.parse(lectureList.getEndTime()));
+                zoomdates.add(zoomDate);
+            }
+
+            zoomRequest.setZoomDates(zoomdates);
+            zoomService.createMeeting(member_id, zoomRequest);
+
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseDto.databaseError();
         }
         ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
@@ -269,12 +358,11 @@ public class LectureRestController {
             @RequestParam(value = "profileFile", required = false) MultipartFile profileFile,
             @RequestParam(value = "descriptionPicFile", required = false) MultipartFile descriptionPicFile) {
 
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
-	    
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
 
         Long member_id = lectureService.getMemberIdById(memberId);
         lecture.setLectureId(lectureId);
@@ -344,11 +432,11 @@ public class LectureRestController {
             @RequestBody Lecture lecture,
             @PathVariable("lecture_id") Long lectureId) {
 
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
 
         Long member_id = lectureService.getMemberIdById(memberId);
         lecture.setLectureId(lectureId);
@@ -397,11 +485,11 @@ public class LectureRestController {
     @SuppressWarnings({ "rawtypes" })
     @DeleteMapping("/delete/{lecture_id}")
     public ResponseEntity<ResponseDto> deleteLectures(@PathVariable("lecture_id") Long lectureId) {
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
 
         Long member_id = lectureService.getMemberIdById(memberId);
         try {
@@ -450,11 +538,11 @@ public class LectureRestController {
     @SuppressWarnings({ "rawtypes" })
     @PostMapping("/refund/{lecture_id}")
     public ResponseEntity<ResponseDto> lectureRefund(@PathVariable("lecture_id") Long lectureId) {
-    	String memberId =  GetAuthenUser.getAuthenUser();
-		// 인증되지 않은 경우는 바로 처리
-	    if (memberId == null) {
-	        return ResponseDto.noAuthentication();
-	    }
+        String memberId = GetAuthenUser.getAuthenUser();
+        // 인증되지 않은 경우는 바로 처리
+        if (memberId == null) {
+            return ResponseDto.noAuthentication();
+        }
 
         Long member_id = lectureService.getMemberIdById(memberId);
 
