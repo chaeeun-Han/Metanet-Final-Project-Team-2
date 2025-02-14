@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +33,6 @@ import com.classpick.web.util.RedisUtil;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +55,7 @@ public class MemberService implements IMemberService {
 	
 	private final JwtTokenProvider jwtProvider;
 	
+	@Autowired
     public MemberService(JavaMailSender javaMailSender, RedisUtil redisUtil, 
             AuthenticationManagerBuilder authenticationManagerBuilder, 
             JwtTokenProvider jwtTokenProvider, RedisTokenService redisTokenService, 
