@@ -44,24 +44,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ZoomService {
 
     private final StringRedisTemplate redisTemplate;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    
-    @Autowired
-    ILectureRepository lectureRepositiory;
-    
-    @Autowired
-    IMemberRepository memberRepository;
-    
-    @Autowired
-    IZoomRepository zoomRepository;
+    private final ILectureRepository lectureRepositiory;
+    private final IMemberRepository memberRepository;
+    private final IZoomRepository zoomRepository;
 
     @Value("${zoom.CLIENT_ID}")
     private String CLIENT_ID;
@@ -72,12 +68,16 @@ public class ZoomService {
     @Value("${zoom.REDIRECT_URI}")
     private String REDIRECT_URI;
 
-    public ZoomService(StringRedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-        this.restTemplate = new RestTemplate();
-        this.objectMapper = new ObjectMapper();
-    }
-
+    @Autowired
+    public ZoomService(StringRedisTemplate redisTemplate, IMemberRepository memberRepository,
+            IZoomRepository zoomRepository, ILectureRepository lectureRepository, RestTemplate restTemplate) {
+			this.redisTemplate = redisTemplate;
+			this.memberRepository = memberRepository;
+			this.zoomRepository = zoomRepository;
+			this.lectureRepositiory = lectureRepository;
+			this.restTemplate = restTemplate;
+			this.objectMapper = new ObjectMapper();
+	}
 
      // Zoom Access Token 요청
     public ZoomTokenResponse requestZoomAccessToken(String code, String memberId) {
