@@ -82,7 +82,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:8080", "https://bamjun.click:443", "http://localhost:3000"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type" ,"skipInterceptor"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
