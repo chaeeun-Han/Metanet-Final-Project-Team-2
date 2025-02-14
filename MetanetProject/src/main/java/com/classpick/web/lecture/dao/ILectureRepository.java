@@ -84,13 +84,15 @@ public interface ILectureRepository {
 
     void updateMeetingInfo(@Param("list") List<ZoomMeetingResponse> responses);
 
-	  List<Lecture> getAllLecture();
+    List<Lecture> getAllLecture();
 
-	  List<LectureDashboard> getLectureDashboard();
+    List<LectureDashboard> getLectureDashboard();
 
     List<PercentDashboard> getPercentDashboard();
 
     List<Tag> getTags();
 
     List<LectureList> getLectureLists(Long lectureId);
+
+    int isAttend(Map<String, Long> params);
 }

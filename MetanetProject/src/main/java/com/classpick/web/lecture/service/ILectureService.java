@@ -63,4 +63,6 @@ public interface ILectureService {
     List<LectureList> getLectureLists(Long lectureId);
 
     List<LectureList> getLectureListByExcel(MultipartFile excelFile, Long lectureId, Long memberId);
+
+    int isAttend(Map<String, Long> params);
 }

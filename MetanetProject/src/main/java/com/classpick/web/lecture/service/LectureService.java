@@ -230,4 +230,9 @@ public class LectureService implements ILectureService {
         }
     }
 
+    @Override
+    public int isAttend(Map<String, Long> params) {
+        return lectureDao.isAttend(params);
+    }
+
 }
