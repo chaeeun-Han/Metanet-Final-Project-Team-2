@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import com.classpick.web.admin.model.LectureDashboard;
+import com.classpick.web.admin.model.PercentDashboard;
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
@@ -81,6 +83,12 @@ public interface ILectureRepository {
     void insertLectureListByExcel(LectureList lectureList);
 
     void updateMeetingInfo(@Param("list") List<ZoomMeetingResponse> responses);
+
+	  List<Lecture> getAllLecture();
+
+	  List<LectureDashboard> getLectureDashboard();
+
+    List<PercentDashboard> getPercentDashboard();
 
     List<Tag> getTags();
 

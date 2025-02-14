@@ -13,4 +13,5 @@ public class Pay {
 	private String endDate;
 	private String title;
 	private String profile;
+	private Long lectureId;
 }

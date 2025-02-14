@@ -59,7 +59,7 @@
 
 	<select id="getAllMembers" resultType="com.classpick.web.member.model.MemberResponse">
 		<![CDATA[
-			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
+			SELECT member_id AS memberId, id as id,CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
 			FROM members
 		]]>
 	</select>
@@ -119,4 +119,29 @@
 		SELECT COUNT(*) from members
 		WHERE email = #{email}
 	</select>
+	
+	<select id="getMemDashboard" resultType="com.classpick.web.admin.model.MemDashboard">
+		SELECT 
+		    CASE 
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 10 AND 19 THEN '10대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 20 AND 29 THEN '20대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 30 AND 39 THEN '30대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 40 AND 49 THEN '40대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 50 AND 59 THEN '50대'
+		        ELSE '기타'
+		    END AS year,
+		    COUNT(*) AS memNum
+		FROM members
+		WHERE deleted = FALSE 
+		GROUP BY year
+		ORDER BY year;	
+	</select>
+		
+	<select id="getStudentTeacherDashboard" resultType="com.classpick.web.admin.model.StudentTeacherDashboard">	
+	    SELECT 
+	        COUNT(CASE WHEN role = 'Student' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS Student,
+	        COUNT(CASE WHEN role = 'Teacher' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS Teacher
+	    FROM members;
+	</select>
+
 </mapper>

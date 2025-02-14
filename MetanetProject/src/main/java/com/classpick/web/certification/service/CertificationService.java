@@ -27,7 +27,7 @@ public class CertificationService implements ICertificationService {
 	IMemberRepository memberRepository;
 
 	@Override
-	public byte[] getCertification(Long memberUID, String lecture_id) {
+	public byte[] getCertification(Long memberUID, Long lecture_id) {
 
 		Certification certification = new Certification();
 		byte[] result = null;
@@ -81,105 +81,105 @@ public class CertificationService implements ICertificationService {
     }
 	
 	public String generateCertificateHtml(String memberName, String title, String start_date, String end_date) {
-		return "<!DOCTYPE html>" +
-				"<html lang=\"ko\">" +
-				"<head>" +
-				"<meta charset=\"UTF-8\">" + "</meta>" +
-				"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" + "</meta>" +
-				"<title>수료증</title>" +
-				"<style>" +
-				"@page {" +
-				"  size: A4;" + // A4 용지 크기 설정
-				"  margin: 0;" + // 여백 설정 (기본 여백을 없앰)
-				"}" +
-				"body {" +
-				"  font-family: 'NanumBarunGothic', sans-serif;" +
-				"  margin: 0;" +
-				"  padding: 0;" +
-				"  height: 100%;" +
-				"  display: flex;" +
-				"  justify-content: center;" +
-				"  align-items: center;" +
-				"  background-color: #f4f4f4;" +
-				"}" +
-				".certificate-container {" +
-				"  width: 80%;" + // 페이지 크기에 맞게 내용 크기 조정
-				"  padding: 40px;" +
-				"  border: 5px solid #5F92FF;" +
-				"  background-color: #ffffff;" +
-				"  text-align: center;" +
-				"  border-radius: 10px;" +
-				"  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" +
-				"}" +
-				/* 이미지 스타일 */
-				".certificate-container-img {" +
-				"  width: 20%;" + // 이미지 크기를 컨테이너에 맞게 줄이기
-				"  opacity: 0.9;" + // 이미지 투명도 설정
-				"  margin-bottom: 20px;" +
-				"  position: absolute;" + // 절대 위치로 설정
-				"  top: 10%;" + // 상단에서 10% 위치
-				"  right: 10%;" + // 왼쪽에서 10% 위치 (이미지가 왼쪽으로 배치되도록)
-				"  transform: translateX(0); " + // 왼쪽 정렬
-				"}" +
-				".left-align {" +
-				"  text-align: left;" + // 왼쪽 정렬 스타일 클래스
-				"  margin-bottom: 20px;" +
-				"}" +
-				"h1 {" +
-				"  color: #5F92FF;" +
-				"  font-size: 36px;" +
-				"  margin-bottom: 30px;" +
-				"}" +
-				"p {" +
-				"  font-size: 20px;" +
-				"  line-height: 1.6;" +
-				"  margin: 10px 0;" +
-				"}" +
-				".strong {" +
-				"  font-weight: bold;" +
-				"}" +
-				".certificate-footer {" +
-				"  margin-top: 50px;" +
-				"  font-size: 16px;" +
-				"  color: #777;" +
-				"}" +
-				".signature {" +
-				"  margin-top: 30px;" +
-				"  font-size: 18px;" +
-				"  color: #333;" +
-				"}" +
-				".lectureTitle {" +
-				"  text-decoration: underline;" +
-				"  font-weight: bold;" +
-				"}" +
-				"</style>" +
-				"</head>" +
-				"<body>" +
-				"<div id=\"certificate\" class=\"certificate-container\">" +
-				"<h1>클래스픽 수료증</h1>" +				
-				"<div class=\"left-align\">" +
-				"<p><span class=\"strong\">이름:</span> " + memberName + "</p>" +
-				"<p><span class=\"strong\">강의명:</span> " + title + "</p>" +
-				"<p><span class=\"strong\">수료일:</span> " + start_date + " ~ " + end_date + "</p>" +
-				"</div>" + "<br>" +"</br>" + "<br>" +"</br>" + "<br>" +"</br>" +
-				"<p>위 사람은 <span class=\"lectureTitle\">" + title + "</span> 강의를 성실히 수행하였기에 증서를 드립니다.</p>" + "<br>" +"</br>" +
-				"<p>본 수료증은 공식 인증서로, 무단 복제 및 변경을 금지합니다.</p>" + "<br>" +"</br>" +
-				"<img src=\"image-placeholder.jpg\" alt=\"check image\" class=\"certificate-container-img\"/>" +
-				"<div class=\"certificate-footer\">" + "<br>" +"</br>" + "<br>" +"</br>" +
-				"<p>발급일: <span class=\"strong\">" + end_date + "</span></p>" +
-				"</div>" +
-				"</div>" +
-				"</body>" +
-				"</html>";
-
+	    return "<!DOCTYPE html>" +
+	            "<html lang=\"ko\">" +
+	            "<head>" +
+	            "<meta charset=\"UTF-8\">" + "</meta>" +
+	            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" + "</meta>" +
+	            "<title>수료증</title>" +
+	            "<style>" +
+	            "@page {" +
+	            "  size: A4;" + // A4 용지 크기 설정
+	            "  margin: 0;" + // 여백 없애기
+	            "}" +
+	            "body {" +
+	            "  font-family: 'NanumBarunGothic', sans-serif;" +
+	            "  margin: 0;" +
+	            "  padding: 0;" +
+	            "  height: 100%;" +
+	            "  display: flex;" +
+	            "  justify-content: center;" + // 페이지 중앙 정렬
+	            "  align-items: center;" +
+	            "  background-color: #f4f4f4;" +
+	            "}" +
+	            ".certificate-container {" +
+	            "  width: 100%;" + // 페이지 가로 크기에 맞춤
+	            "  height: 100%;" + // 페이지 세로 크기에 맞춤
+	            "  padding: 30px;" + // 패딩을 적당히 조정
+	            "  border: 5px solid #5F92FF;" +
+	            "  background-color: #ffffff;" +
+	            "  text-align: center;" +
+	            "  border-radius: 10px;" +
+	            "  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" +
+	            "}" +
+	            ".certificate-container-img {" +
+	            "  width: 15%;" + // 이미지 크기 조정
+	            "  opacity: 0.9;" +
+	            "  margin-bottom: 20px;" +
+	            "  position: absolute;" +
+	            "  top: 10%;" +
+	            "  right: 10%;" +
+	            "  transform: translateX(0);" +
+	            "}" +
+	            ".left-align {" +
+	            "  text-align: left;" +
+	            "  margin-bottom: 20px;" +
+	            "}" +
+	            "h1 {" +
+	            "  color: #5F92FF;" +
+	            "  font-size: 36px;" +
+	            "  margin-bottom: 30px;" +
+	            "}" +
+	            "p {" +
+	            "  font-size: 20px;" +
+	            "  line-height: 1.6;" +
+	            "  margin: 10px 0;" +
+	            "}" +
+	            ".strong {" +
+	            "  font-weight: bold;" +
+	            "}" +
+	            ".certificate-footer {" +
+	            "  margin-top: 50px;" +
+	            "  font-size: 16px;" +
+	            "  color: #777;" +
+	            "}" +
+	            ".signature {" +
+	            "  margin-top: 30px;" +
+	            "  font-size: 18px;" +
+	            "  color: #333;" +
+	            "}" +
+	            ".lectureTitle {" +
+	            "  text-decoration: underline;" +
+	            "  font-weight: bold;" +
+	            "}" +
+	            "</style>" +
+	            "</head>" +
+	            "<body>" +
+	            "<div id=\"certificate\" class=\"certificate-container\">" +
+	            "<h1>클래스픽 수료증</h1>" +    "<br>" + "</br>" +"<br>" + "</br>" +            
+	            "<div class=\"left-align\">"+
+	            "<p><span class=\"strong\">이름:</span> " + memberName + "</p>" +"<br>" + "</br>" + 
+	            "<p><span class=\"strong\">강의명:</span> " + title + "</p>" +"<br>" + "</br>" + 
+	            "<p><span class=\"strong\">수료일:</span> " + start_date + " ~ " + end_date + "</p>" +"<br>" + "</br>" + 
+	            "</div>" +"<br>" + "</br>" +"<br>" + "</br>" +"<br>" + "</br>" + 
+	            "<p>위 사람은 <span class=\"lectureTitle\">" + title + "</span> 강의를 성실히 수행하였기에 증서를 드립니다.</p>" +
+	            "<br>" + "</br>" + "<br>" + "</br>" +"<br>" + "</br>" +
+	            "<p>본 수료증은 공식 인증서로, 무단 복제 및 변경을 금지합니다.</p>" +"<br>" + "</br>" +
+	            "<img src=\"image-placeholder.jpg\" alt=\"check image\" class=\"certificate-container-img\"/>" +
+	            "<br>" + "</br>" +"<br>" + "</br>" +"<br>" + "</br>" +"<br>" + "</br>" +
+	            "<div class=\"certificate-footer\">" +
+	            "<p>발급일: <span class=\"strong\">" + end_date + "</span></p>" +
+	            "</div>" +
+	            "</div>" +
+	            "</body>" +
+	            "</html>";
 	}
 
 
 
 
-
-	public boolean checkCourable(Long memberUID, String lecture_id) {
-		// 해당 회원이 수료 가능할 때만
+	@Override
+	public boolean checkCourable(Long memberUID, Long lecture_id) {		
 		if (certificationRepository.getCourseable(memberUID, lecture_id)) {
 			return true;
 		} else {

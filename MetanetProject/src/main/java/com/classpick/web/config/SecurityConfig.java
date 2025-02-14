@@ -43,16 +43,18 @@ public class SecurityConfig {
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
 				.requestMatchers("/account/lecture", "/account/category", "/account/update", "/account", "/account/pay-log"
-						,"/account/my-study").permitAll()
-				.requestMatchers("/account/teacher-lecture").hasAnyRole("Admin", "Teacher")
+						,"/account/my-study").hasAnyRole("Student", "Teacher", "Admin")
+				.requestMatchers("/account/teacher-lecture", "/account/edit-bank", "/account/delete-bank","/account/add-bank").hasAnyRole("Admin", "Teacher")
 				.requestMatchers("/lectures/all", "/lectures/{lectureId:[0-9]+}", "/lectures/{lectureId:[0-9]+}/reviews").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/*/reviews").permitAll()
 				.requestMatchers("/lectures/likes/**").hasAnyRole("Student", "Teacher", "Admin")
+				.requestMatchers("/cart/**").permitAll()
+				.requestMatchers("/certification/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
 	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
 				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
-				.requestMatchers("/revenue").hasAnyRole("Teacher", "Admin")
+				.requestMatchers("/account/revenue").hasAnyRole("Teacher", "Admin")
 	            .requestMatchers("/admin/**").hasRole("Admin")
 				.requestMatchers("/ws/**").permitAll()
 	            .requestMatchers("/user/**").permitAll()
@@ -60,6 +62,7 @@ public class SecurityConfig {
 	            .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
 	            .requestMatchers("/zoom/*").permitAll()
 	            .requestMatchers("/error", "/favicon.ico").permitAll()
+	            .requestMatchers("/excel/**").hasAnyRole("Teacher", "Admin")
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요
 		);
 
