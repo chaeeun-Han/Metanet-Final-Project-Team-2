@@ -52,17 +52,18 @@ public class SecurityConfig {
 				.requestMatchers("/cart/**").permitAll()
 				.requestMatchers("/certification/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
-	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
+	      .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
 				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
 				.requestMatchers("/account/revenue").hasAnyRole("Teacher", "Admin")
-	            .requestMatchers("/admin/**").hasRole("Admin")
+	      .requestMatchers("/admin/**").hasRole("Admin")
 				.requestMatchers("/ws/**").permitAll()
-	            .requestMatchers("/user/**").permitAll()
-	            .requestMatchers("/topic/**", "/queue/**").permitAll()
-	            .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
-	            .requestMatchers("/zoom/*").permitAll()
-	            .requestMatchers("/error", "/favicon.ico").permitAll()
-	            .requestMatchers("/excel/**").hasAnyRole("Teacher", "Admin")
+	      .requestMatchers("/user/**").permitAll()
+	      .requestMatchers("/topic/**", "/queue/**").permitAll()
+	      .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
+	      .requestMatchers("/zoom/*").permitAll()
+	      .requestMatchers("/favicon.ico").permitAll()
+        .requestMatchers("/excel/**").hasAnyRole("Teacher", "Admin")
+			  .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
 				.anyRequest().authenticated() // 모든 요청은 인증이 필요
 		);
 
@@ -83,7 +84,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:8080", "https://bamjun.click:443", "http://localhost:3000"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type" ,"skipInterceptor"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
