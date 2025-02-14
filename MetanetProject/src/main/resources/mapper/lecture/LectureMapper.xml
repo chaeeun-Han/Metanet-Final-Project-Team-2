@@ -128,7 +128,7 @@
 
     <update id="updateLikeLectures" parameterType="map" >
      <![CDATA[
-        UPDATE lectures SET likes = likes + IF( #{exist} , -1 , +1 ) WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
+        UPDATE lectures SET likes = likes + IF( #{exist} , -1 , +1 ) WHERE lecture_id = #{lectureId}
     ]]>
 	</update>
 
@@ -425,6 +425,14 @@
 		FROM lectures	
 		order by lecture_id asc;	
 	</select>
+
+    <select id="isAttend" parameterType="map" resultType="int">
+    <![CDATA[
+
+    SELECT count(*) FROM attends WHERE member_id = #{memberId} AND lecture_id = #{lectureId}
+
+    ]]>
+    </select>
 	
 	<select id="getLectureDashboard" resultType="com.classpick.web.admin.model.LectureDashboard">
 	    SELECT 
