@@ -6,15 +6,19 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.classpick.web.common.response.ResponseDto;
+import com.classpick.web.jwt.JwtTokenProvider;
 import com.classpick.web.jwt.model.JwtToken;
 import com.classpick.web.member.model.Member;
 import com.classpick.web.member.service.IMemberService;
@@ -38,6 +42,8 @@ public class AuthRestController {
 	PasswordEncoder passwordEncoder;
 
 	private final RegexUtil regexUtil = new RegexUtil();
+	
+	JwtTokenProvider jwtTokenProvider;
 
 	// 회원가입 - 신영서
 	@PostMapping("/join")
@@ -323,4 +329,6 @@ public class AuthRestController {
 
 		return memberService.toolMember(user);					
 	}
+	
+
 }

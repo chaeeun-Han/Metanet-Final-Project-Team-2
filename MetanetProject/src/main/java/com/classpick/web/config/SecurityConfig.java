@@ -43,27 +43,29 @@ public class SecurityConfig {
 				.requestMatchers("/auth/**").permitAll()
 				.requestMatchers("/email/**").permitAll()
 				.requestMatchers("/account/lecture", "/account/category", "/account/update", "/account", "/account/pay-log"
-						,"/account/my-study").permitAll()
-				.requestMatchers("/account/teacher-lecture").hasAnyRole("Admin", "Teacher")
+						,"/account/my-study").hasAnyRole("Student", "Teacher", "Admin")
+				.requestMatchers("/account/teacher-lecture", "/account/edit-bank", "/account/delete-bank","/account/add-bank").hasAnyRole("Admin", "Teacher")
 				.requestMatchers("/lectures/all", "/lectures/{lectureId:[0-9]+}", "/lectures/{lectureId:[0-9]+}/reviews").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "lectures/*/reviews").permitAll()
 				.requestMatchers("/lectures/likes/**").hasAnyRole("Student", "Teacher", "Admin")
+				.requestMatchers("/cart/**").permitAll()
+				.requestMatchers("/certification/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/lectures/*/questions").permitAll()
-	            .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
+	      .requestMatchers(HttpMethod.GET, "/lectures/*/questions/*").permitAll()
 				.requestMatchers("/lectures/**").hasAnyRole("Student", "Teacher", "Admin")
-				.requestMatchers("/revenue").hasAnyRole("Teacher", "Admin")
-	            .requestMatchers("/admin/**").hasRole("Admin")
+				.requestMatchers("/account/revenue").hasAnyRole("Teacher", "Admin")
+	      .requestMatchers("/admin/**").hasRole("Admin")
 				.requestMatchers("/ws/**").permitAll()
-	            .requestMatchers("/user/**").permitAll()
-	            .requestMatchers("/topic/**", "/queue/**").permitAll()
-	            .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
-	            .requestMatchers("/zoom/*").permitAll()
-	            .requestMatchers("/favicon.ico").permitAll()
-	            .anyRequest().authenticated()
-			    )
-			    .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
-			    
+	      .requestMatchers("/user/**").permitAll()
+	      .requestMatchers("/topic/**", "/queue/**").permitAll()
+	      .requestMatchers("/zoom/*/meetings").hasAnyRole("Teacher", "Admin")
+	      .requestMatchers("/zoom/*").permitAll()
+	      .requestMatchers("/favicon.ico").permitAll()
+        .requestMatchers("/excel/**").hasAnyRole("Teacher", "Admin")
+			  .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
+				.anyRequest().authenticated() // 모든 요청은 인증이 필요
+		);
 
 		// JWT 인증을 위해 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
 		http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

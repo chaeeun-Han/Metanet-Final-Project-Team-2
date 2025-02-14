@@ -49,4 +49,5 @@ public interface IMemberService {
 	ResponseEntity<ResponseDto> toolMember(String user);
 
 	boolean isEmailDuplicated(String email);
+	
 }

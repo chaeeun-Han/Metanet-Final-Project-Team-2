@@ -7,6 +7,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import com.classpick.web.account.model.EndLecture;
+import com.classpick.web.admin.model.LectureDashboard;
+import com.classpick.web.admin.model.MemDashboard;
+import com.classpick.web.admin.model.PercentDashboard;
+import com.classpick.web.admin.model.StudentTeacherDashboard;
 import com.classpick.web.excel.model.MemberForExcel;
 import com.classpick.web.member.model.Member;
 import com.classpick.web.member.model.MemberResponse;
@@ -52,5 +56,11 @@ public interface IMemberRepository {
 	Member findByUserId(String user);
 
 	int isEmailDuplicated(String email);
+
+	Member getAllMembers(Long memberUID);
+
+	List<MemDashboard> getMemDashboard();
+
+	List<StudentTeacherDashboard> getStudentTeacherDashboard();		
 	
 }

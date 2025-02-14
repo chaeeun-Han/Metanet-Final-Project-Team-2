@@ -13,5 +13,7 @@ public interface IAdminService {
 	ResponseEntity<ResponseDto> deleteAllMembers();
 	ResponseEntity<ResponseDto> deleteLectures(DeleteLectureRequest lectureIds);
 	ResponseEntity<ResponseDto> deleteAllLectures();
+	ResponseEntity<ResponseDto> getAllLectures();
+	ResponseEntity<ResponseDto> getDashboard();
 	
 }

@@ -11,8 +11,8 @@ public interface ICertificationRepository {
 
 	String getNameByUser(Long memberUID);
 
-	boolean getCourseable(Long memberUID, String lecture_id);
+	boolean getCourseable(Long memberUID, Long lecture_id);
 
-	Certification getLecutre_title(String memberName, String lecture_id);
+	Certification getLecutre_title(String memberName, Long lecture_id);
 
 }

@@ -37,6 +37,22 @@
 	]]>
 	</select>
 
+    <select id="getLectureLists" parameterType="Long" resultType="com.classpick.web.lecture.model.LectureList" >
+        <![CDATA[
+            SELECT k.name, title, description, start_time AS startTime, end_time AS endTime
+            FROM lecture_lists i
+            JOIN members k on i.member_id = k.member_id
+            WHERE lecture_id = #{lectureId}
+        ]]>
+    </select>
+
+    <select id="getTags" resultType="com.classpick.web.lecture.model.Tag">
+    <![CDATA[
+        SELECT tag_id , tag_name 
+        FROM tags
+    ]]>
+    </select>
+
     <select id="getRankByDeadDateLectures" resultType="com.classpick.web.lecture.model.Lecture">
 	<![CDATA[
         SELECT 
@@ -66,7 +82,7 @@
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
-        ORDER BY l.deadline_time ASC
+        ORDER BY l.deadline_time DESC
         LIMIT 5;
 	]]>
 	</select>
@@ -100,7 +116,7 @@
         LEFT JOIN tags t ON lt.tag_id = t.tag_id
         WHERE l.deleted = 0
         GROUP BY l.lecture_id
-        ORDER BY l.likes ASC
+        ORDER BY l.likes DESC
         LIMIT 5;
     ]]>
     </select>
@@ -375,13 +391,13 @@
 	]]>	
 	</select>
 
-    <insert id="insertLectureListByExcel" parameterType="com.classpick.web.lecture.model.LectureList">
+    <insert id="insertLectureListByExcel" parameterType="com.classpick.web.lecture.model.LectureList" useGeneratedKeys="true" keyProperty="lectureListId">
     <![CDATA[
         INSERT
             INTO lecture_lists
             (lecture_id, member_id, title, description, start_time, end_time)
             VALUES
-            (#{lecture_id}, #{member_id}, #{title}, #{description}, #{start_time}, #{end_time})
+            (#{lectureId}, #{memberId}, #{title}, #{description}, #{startTime}, #{endTime})
     ]]>
     </insert>
 	
@@ -404,4 +420,41 @@
 	    </foreach>
 	</update>
 	
+	<select id="getAllLecture">
+		SELECT lecture_id as lectureId, title as title, category as category,deleted as deleted, start_date as startDate, end_date as endDate
+		FROM lectures	
+		order by lecture_id asc;	
+	</select>
+	
+	<select id="getLectureDashboard" resultType="com.classpick.web.admin.model.LectureDashboard">
+	    SELECT 
+	        CASE 
+	            WHEN price BETWEEN 10000 AND 19999 THEN '1만원대'
+	            WHEN price BETWEEN 20000 AND 29999 THEN '2만원대'
+	            WHEN price BETWEEN 30000 AND 39999 THEN '3만원대'
+	            WHEN price BETWEEN 40000 AND 49999 THEN '4만원대'
+	            WHEN price BETWEEN 50000 AND 59999 THEN '5만원대'
+	            ELSE '기타'
+	        END AS price,
+	        COUNT(*) AS lecNum
+	    FROM lectures
+	    WHERE deleted = FALSE  
+	    GROUP BY price
+	    ORDER BY price;
+	</select>
+
+	<select id="getPercentDashboard"  resultType="com.classpick.web.admin.model.PercentDashboard">
+		SELECT 
+		    DATE_FORMAT(start_date, '%Y-%m') AS date,  
+		    SUM(price * 0.1) AS payPercent 
+		FROM 
+		    lectures
+		WHERE 
+		    deleted = FALSE
+		    AND start_date >= CURDATE() - INTERVAL 6 MONTH 
+		GROUP BY 
+		    DATE_FORMAT(start_date, '%Y-%m')  
+		ORDER BY 
+		    date ASC;  
+	</select>
 </mapper>
