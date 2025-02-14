@@ -195,12 +195,22 @@ public class LectureRestController {
         if (memberId == null)
             return ResponseDto.noAuthentication();
 
+        Long member_id = lectureService.getMemberIdById(memberId);
+
+        Map<String, Long> params = new HashMap<String, Long>();
+        params.put("memberId", member_id);
+        params.put("lectureId", lectureId);
+
+        int is_buyed = lectureService.isAttend(params);
+
         try {
             List<LectureFile> lectureFiles = lectureService.getLectureFiles(lectureId);
             List<String> urls = new ArrayList<String>();
+            urls.add(Integer.toString(is_buyed));
             for (LectureFile lectureFile : lectureFiles) {
                 urls.add(lectureFile.getFileUrl());
             }
+
             ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, urls);
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {

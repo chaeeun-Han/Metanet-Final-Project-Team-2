@@ -9,6 +9,7 @@ import lombok.ToString;
 @ToString
 public class Review {
     private Long reviewId;
+    private String id;
     private String profile;
     private Long lectureId;
     private Long memberId;
