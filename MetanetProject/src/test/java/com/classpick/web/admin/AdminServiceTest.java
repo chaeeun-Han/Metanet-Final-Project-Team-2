@@ -47,8 +47,6 @@ class AdminServiceTest {
         deleteLectureRequest.setLectureIds(List.of(10L, 20L, 30L));
     }
 
-    // ✅ 성공 테스트
-
     @Test
     @DisplayName("회원 전체 조회 - 성공")
     void getAllMembers_Success() {
@@ -114,8 +112,6 @@ class AdminServiceTest {
         assertEquals("SU", response.getBody().getCode());
         assertEquals("SUCCESS", response.getBody().getMessage().toUpperCase());
     }
-
-    // ✅ 실패 테스트
 
     @Test
     @DisplayName("회원 전체 조회 - 실패 (DB 오류)")
