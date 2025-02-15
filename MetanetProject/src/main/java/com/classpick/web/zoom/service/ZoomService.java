@@ -200,92 +200,61 @@ public class ZoomService {
     }
     
     //줌 회의실 생성 - 소진
-  	public ResponseEntity<ResponseDto> createMeeting(Long memberUID, ZoomMeetingRequest zoomMeetingRequest) {
-  		String email = memberRepository.getAttendIdById(memberUID);
-  		String url = "https://api.zoom.us/v2/users/" + email + "/meetings";
-  		List<ZoomMeetingResponse> zoomResponses = new ArrayList<>();
-  		RestTemplate restTemplate = new RestTemplate();
-  		HttpHeaders headers = new HttpHeaders();
-  		
-  		String accessToken = redisTemplate.opsForValue().get("zoom_accessToken:" + memberUID);
-  		if (accessToken == null) {   
-        	try {
-        		ZoomTokenResponse newToken = refreshZoomToken(memberUID);
+    public ResponseEntity<ResponseDto> createMeeting(Long memberUID, ZoomMeetingRequest zoomMeetingRequest) {
+
+        String email = memberRepository.getAttendIdById(memberUID);
+        String url = "https://api.zoom.us/v2/users/" + email + "/meetings";
+
+        List<ZoomMeetingResponse> zoomResponses = new ArrayList<>();
+
+        String accessToken = redisTemplate.opsForValue().get("zoom_accessToken:" + memberUID);
+        if (accessToken == null) {
+            try {
+                ZoomTokenResponse newToken = refreshZoomToken(memberUID);
                 accessToken = newToken.getAccessToken();
-        	} catch(RuntimeException e) {
-        		e.printStackTrace();
-        		return ResponseDto.noAuthentication();
-        	}
-        	
-  		}
-  		
-  		headers.add("Authorization", "Bearer " + accessToken);
-  	    headers.add("Content-Type", "application/json");
-  		
-  		//줌 회의실 생성 - topic, startTime, duration, hostEmail 설정
-  		for (ZoomDate zoomDate : zoomMeetingRequest.getZoomDates()) {
-  			//회의 설정
-  			ZoomMeetingObject zoomMeetingObject = new ZoomMeetingObject();
-  			zoomMeetingObject.setTopic(zoomDate.getLectureListId().toString());
-  			String startTime = convertToLocalDateTime(zoomDate.getDate(), zoomDate.getStartTime()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-  			int duration = (int) ChronoUnit.MINUTES.between(convertToLocalDateTime(zoomDate.getDate(), zoomDate.getStartTime()), convertToLocalDateTime(zoomDate.getDate(), zoomDate.getEndTime()));
-  			zoomMeetingObject.setStartTime(startTime);
-  			zoomMeetingObject.setDuration(duration);
-  			zoomMeetingObject.setHostEmail(email);
-  			
-  			try {
-  				HttpEntity<ZoomMeetingObject> requestEntity = new HttpEntity<>(zoomMeetingObject, headers);
-  			    ResponseEntity<ZoomMeetingResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, ZoomMeetingResponse.class);
+            } catch (RuntimeException e) {
+                return ResponseDto.noAuthentication();
+            }
+        }
 
-  			    if (response.getStatusCode() == HttpStatus.CREATED) {
-  			    	ZoomMeetingResponse zoomMeetingResponse = response.getBody();
-  			    	zoomMeetingResponse.setLectureListId(zoomDate.getLectureListId());
-  			    	zoomResponses.add(zoomMeetingResponse);
-  			    }
-  			} catch (HttpClientErrorException  e) {
-  				String errorMessage = "Zoom API 응답 파싱 실패";
-  	            int errorCode = -1;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-Type", "application/json");
 
-  	            try {
-  	                Map<String, Object> errorResponse = objectMapper.readValue(
-  	                    e.getResponseBodyAsString(), new TypeReference<Map<String, Object>>() {}
-  	                );
+        for (ZoomDate zoomDate : zoomMeetingRequest.getZoomDates()) {
+            ZoomMeetingObject zoomMeetingObject = new ZoomMeetingObject();
+            zoomMeetingObject.setTopic(zoomDate.getLectureListId().toString());
+            String startTime = convertToLocalDateTime(zoomDate.getDate(), zoomDate.getStartTime()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+            int duration = (int) ChronoUnit.MINUTES.between(convertToLocalDateTime(zoomDate.getDate(), zoomDate.getStartTime()), convertToLocalDateTime(zoomDate.getDate(), zoomDate.getEndTime()));
+            zoomMeetingObject.setStartTime(startTime);
+            zoomMeetingObject.setDuration(duration);
+            zoomMeetingObject.setHostEmail(email);
 
-  	                errorCode = (int) errorResponse.getOrDefault("code", -1);
-  	                errorMessage = (String) errorResponse.getOrDefault("message", "알 수 없는 오류 발생");
+            try {
+                HttpEntity<ZoomMeetingObject> requestEntity = new HttpEntity<>(zoomMeetingObject, headers);
+                ResponseEntity<ZoomMeetingResponse> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, ZoomMeetingResponse.class);
 
-  	            } catch (Exception jsonException) {
-  	                System.err.println("JSON 파싱 오류: " + jsonException.getMessage());
-  	            }
+                if (response.getStatusCode() == HttpStatus.CREATED) {
+                    ZoomMeetingResponse zoomMeetingResponse = response.getBody();
+                    zoomMeetingResponse.setLectureListId(zoomDate.getLectureListId());
+                    zoomResponses.add(zoomMeetingResponse);
+                }
+            } catch (HttpClientErrorException e) {
+                return ResponseEntity.status(e.getStatusCode())
+                        .body(new ResponseDto(ResponseCode.ZOOM_BAD_REQUEST, "Zoom API 요청 실패", e.getMessage()));
+            }
+        }
 
-  	            HttpStatusCode status = e.getStatusCode();
+        try {
+            lectureRepositiory.updateMeetingInfo(zoomResponses);
+        } catch (Exception e) {
+            return ResponseDto.databaseError();
+        }
 
-  	            if (status == HttpStatus.BAD_REQUEST) {
-  	                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-  	                        .body(new ResponseDto(ResponseCode.ZOOM_BAD_REQUEST, ResponseMessage.ZOOM_BAD_REQUEST, errorMessage));
-  	            } else if (status == HttpStatus.NOT_FOUND) {
-  	                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-  	                        .body(new ResponseDto(ResponseCode.ZOOM_NOT_FOUND, ResponseMessage.ZOOM_NOT_FOUND, errorMessage));
-  	            } else if (status == HttpStatus.TOO_MANY_REQUESTS) {
-  	                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-  	                        .body(new ResponseDto(ResponseCode.ZOOM_TOO_MANY_REQUESTS, ResponseMessage.ZOOM_TOO_MANY_REQUESTS, errorMessage));
-  	            } else {
-  	            	e.printStackTrace();
-  	                return ResponseDto.serverError();
-  	            }
-  	            
-  			}
-  			
-  			try {
-  				lectureRepositiory.updateMeetingInfo(zoomResponses);
-  			} catch (Exception e) {
-  				e.printStackTrace();
-  				return ResponseDto.databaseError();
-  			}
+        return ResponseDto.success();
+    }
 
-  		}
-  		return ResponseDto.success();
-  	}
+
   	
   	public ResponseEntity<ResponseDto> registerAttendance(String topic, String email, String leaveTime) {
   		try {
