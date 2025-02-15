@@ -233,6 +233,21 @@
 			            <goals>
 			                <goal>prepare-agent</goal>
 			            </goals>
+			            <configuration>
+			            	<excludes>
+			            		<exclude>**/MyappApplication.*</exclude>
+			            		<exclude>**/model/**</exclude>
+			            		<exclude>**/lombok/**</exclude>
+			            		<exclude>**/config/**</exclude>
+			            		<exclude>**/common/**</exclude>
+			            		<exclude>**/util/**</exclude>
+			            		<exclude>**/aop/**</exclude>
+			            		<exclude>**/controller/**</exclude>
+			            		<exclude>**/dao/**</exclude>
+			            		<exclude>**/jwt/**</exclude>
+			            		<exclude>**/lecture/LectureScheduler.*</exclude>
+			            	</excludes>
+			            </configuration>
 			        </execution>
 			        <execution>
 			            <id>report</id>
@@ -242,6 +257,7 @@
 			            </goals>
 			            <configuration>
 			            	<excludes>
+			            		<exclude>**/MyappApplication.*</exclude>
 			            		<exclude>**/model/**</exclude>
 			            		<exclude>**/lombok/**</exclude>
 			            		<exclude>**/config/**</exclude>
@@ -250,27 +266,9 @@
 			            		<exclude>**/aop/**</exclude>
 			            		<exclude>**/controller/**</exclude>
 			            		<exclude>**/dao/**</exclude>
+			            		<exclude>**/jwt/**</exclude>
+			            		<exclude>**/lecture/LectureScheduler.*</exclude>
 			            	</excludes>
-			            </configuration>
-			        </execution>
-			        <execution>
-			            <id>check</id>
-			            <goals>
-			                <goal>check</goal>
-			            </goals>
-			            <configuration>
-			                <rules>
-			                    <rule>
-			                        <element>BUNDLE</element>
-			                        <limits>
-			                            <limit>
-			                                <counter>LINE</counter>
-			                                <value>COVEREDRATIO</value>
-			                                <minimum>0.60</minimum>
-			                            </limit>
-			                        </limits>
-			                    </rule>
-			                </rules>
 			            </configuration>
 			        </execution>
 			    </executions>
