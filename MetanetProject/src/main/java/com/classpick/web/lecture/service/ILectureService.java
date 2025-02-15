@@ -3,8 +3,10 @@ package com.classpick.web.lecture.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.classpick.web.common.response.ResponseDto;
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
 import com.classpick.web.lecture.model.LectureId;
@@ -48,7 +50,7 @@ public interface ILectureService {
 
     void updateLectureTags(Long lectureId, String tags);
 
-    void buyLecture(Map<String, Long> params);
+    ResponseEntity<ResponseDto> buyLecture(Map<String, Long> params);
 
     Boolean checkCanRefund(Map<String, Long> params);
 
