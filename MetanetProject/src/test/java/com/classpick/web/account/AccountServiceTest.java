@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,6 +53,7 @@ class AccountServiceTest {
     private final Long testMemberId = 1L;
 
     @Test
+    @DisplayName("강의 조회 - 성공")
     void getLecture_Success() {
         List<AccountLecture> mockLectures = List.of(new AccountLecture("IT", "Java Basics", "profile.jpg", true));
         when(accountRepository.getLecture(testMemberId)).thenReturn(mockLectures);
@@ -63,6 +65,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("강의 조회 - 강의 없음")
     void getLecture_Empty() {
         when(accountRepository.getLecture(testMemberId)).thenReturn(new ArrayList<>());
         when(memberRepository.getMemberIdById(testUser)).thenReturn(testMemberId);
@@ -73,8 +76,8 @@ class AccountServiceTest {
     }
     
     @Test
+    @DisplayName("내 수강 강의 조회 - 강의 없음")
     void getMyStudy_MyStudyLectureListEmpty() {
-        // Given
         MyStudy myStudy = new MyStudy();
         myStudy.setLectureId(1L);
 
@@ -84,10 +87,8 @@ class AccountServiceTest {
         when(accountRepository.getMyStudyLectureList(anyLong(), eq(testMemberId)))
             .thenReturn(new ArrayList<>());
 
-        // When
         ResponseEntity<ResponseDto> response = accountService.getMyStudy(testUser);
 
-        // Then
         assertEquals(200, response.getStatusCode().value());
 
         List<MyStudy> responseData = (List<MyStudy>) response.getBody().getData();
@@ -96,6 +97,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("마이페이지 조회 - 성공")
     void getMyPage_Success() {
     	when(accountRepository.getMyPage(testMemberId)).thenReturn(new Member());
     	when(memberRepository.getMemberIdById(testUser)).thenReturn(testMemberId);
@@ -104,6 +106,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("마이페이지 조회 - DB 오류")
     void getMyPage_DatabaseError() {
         when(accountRepository.getMyPage(testMemberId)).thenThrow(new RuntimeException("DB Error"));
         ResponseEntity<ResponseDto> response = accountService.getMyPage(testUser);
@@ -111,6 +114,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("프로필 수정 - 성공(이미지 없이)")
     void updateProfile_WithoutFile_Success() {
         UpdateMember updateMember = new UpdateMember();
         updateMember.setName("Updated Name");
@@ -122,6 +126,7 @@ class AccountServiceTest {
 
 
     @Test
+    @DisplayName("프로필 수정 - 태그 없음")
     void updateProfile_EmptyTags_ShouldReturn200() {
         UpdateMember updateMember = new UpdateMember();
         updateMember.setName("Updated Name");
@@ -132,24 +137,23 @@ class AccountServiceTest {
     }
     
     @Test
+    @DisplayName("프로필 수정 - 태그 있음")
     void updateProfile_WithExistingCategories_ShouldDeleteAndInsertCategories() {
-        // Given
         UpdateMember updateMember = new UpdateMember();
         updateMember.setName("Updated Name");
         updateMember.setTags("AI, Cloud, Security");
         when(memberRepository.getMemberIdById(testUser)).thenReturn(testMemberId);
         when(accountRepository.selectCount(testMemberId)).thenReturn(1);
 
-        // When
         ResponseEntity<ResponseDto> response = accountService.updateProfile(testUser, updateMember);
 
-        // Then
         assertEquals(200, response.getStatusCode().value());
 
         verify(accountRepository, times(1)).deleteCategory(testMemberId);
     }
 
     @Test
+    @DisplayName("은행 계좌 수정 - 성공")
     void updateBank_Success() {
         String bankName = "KB Bank";
         ResponseEntity<ResponseDto> response = accountService.updateBank(bankName, testUser);
@@ -157,6 +161,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("은행 계좌 수정 - DB 오류")
     void updateBank_DatabaseError() {
         String bankName = "KB Bank";
         doThrow(new RuntimeException("DB Error")).when(accountRepository).updateBank(eq(bankName), eq(testMemberId));
@@ -166,6 +171,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("은행 계좌 추가 - 성공")
     void addBank_Success() {
         String bankName = "KB Bank";
         ResponseEntity<ResponseDto> response = accountService.addBank(bankName, testUser);
@@ -173,6 +179,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("은행 계좌 추가 - DB 오류")
     void addBank_DatabaseError() {
         String bankName = "KB Bank";
         doThrow(new RuntimeException("DB Error")).when(accountRepository).addBank(eq(bankName), eq(testMemberId));
@@ -182,12 +189,14 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("은행 계좌 삭제 - 성공")
     void deleteBank_Success() {
         ResponseEntity<ResponseDto> response = accountService.deleteBank(testUser);
         assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
+    @DisplayName("은행 계좌 삭제 - DB 오류")
     void deleteBank_DatabaseError() {
         doThrow(new RuntimeException("DB Error")).when(accountRepository).deleteBank(eq(testMemberId));
 
@@ -196,6 +205,7 @@ class AccountServiceTest {
     }
     
     @Test
+    @DisplayName("선생님 강의 조회 - null")
     void getTeacherLectures_AllNull_ShouldReturnEmptyLists() {
         when(accountRepository.getDueToLectures(testMemberId)).thenReturn(null);
         when(accountRepository.getIngLectures(testMemberId)).thenReturn(null);
@@ -214,6 +224,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("선생님 강의 조회 - empty")
     void getTeacherLectures_AllEmptyLists_ShouldReturnEmptyLists() {
         when(accountRepository.getDueToLectures(testMemberId)).thenReturn(new ArrayList<>());
         when(accountRepository.getIngLectures(testMemberId)).thenReturn(new ArrayList<>());
@@ -232,6 +243,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("오류")
     void unexpectedErrorHandling() {
         when(accountRepository.getLecture(testMemberId)).thenThrow(new RuntimeException("Unexpected Error"));
 
@@ -240,6 +252,7 @@ class AccountServiceTest {
     }
     
     @Test
+    @DisplayName("강의 조회 - DB 오류")
     void getLecture_ShouldReturnDatabaseError_WhenRepositoryThrowsException() {
         when(accountRepository.getLecture(anyLong())).thenThrow(new RuntimeException("DB 오류"));
 
@@ -249,6 +262,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("강의 조회 - empty")
     void getLecture_ShouldReturnEmptyList_WhenNoLecturesFound() {
         when(accountRepository.getLecture(anyLong())).thenReturn(new ArrayList<>());
 
@@ -259,6 +273,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("구매 내역 조회 - empty")
     void getPaylog_ShouldReturnEmptyList_WhenNoPaymentsFound() {
         when(accountRepository.getPaylog(anyLong())).thenReturn(new ArrayList<>());
         
@@ -269,6 +284,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("구매 내역 조회 - DB 오류")
     void getPaylog_ShouldReturnDatabaseError_WhenRepositoryThrowsException() {
         when(accountRepository.getPaylog(anyLong())).thenThrow(new RuntimeException("DB 오류"));
 
@@ -278,6 +294,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("내 학습 조회 - empty")
     void getMyStudy_ShouldReturnEmptyList_WhenNoStudiesFound() {
         when(accountRepository.getMyStudy(anyLong())).thenReturn(new ArrayList<>());
 
@@ -288,6 +305,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("내 학습 조회 - 학습 정보는 있지만 강의 목록 없음")
     void getMyStudy_ShouldReturnEmptyLectureLists_WhenNoLectureListsFound() {
         MyStudy myStudy = new MyStudy();
         myStudy.setLectureId(1L);
@@ -303,6 +321,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("내 학습 조회 - 모든 강의 목록 없음")
     void getMyLecture_ShouldReturnEmptyLists_WhenNoLecturesFound() {
         when(accountRepository.getDueToLectures(anyLong())).thenReturn(new ArrayList<>());
         when(accountRepository.getIngLectures(anyLong())).thenReturn(new ArrayList<>());
@@ -318,6 +337,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("선생님 강의 조회 - null")
     void getTeacherLectures_ShouldHandleNullLists() {
         when(accountRepository.getDueToLectures(anyLong())).thenReturn(null);
         when(accountRepository.getIngLectures(anyLong())).thenReturn(null);
@@ -336,6 +356,7 @@ class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("태그 추가 - 성공")
     void insertCategory_ShouldInsertCategories_WhenValidTagsProvided() {
         when(memberRepository.getMemberIdById(testUser)).thenReturn(testMemberId);
 
