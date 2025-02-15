@@ -13,9 +13,14 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.classpick.web.common.response.ResponseCode;
+import com.classpick.web.common.response.ResponseDto;
+import com.classpick.web.common.response.ResponseMessage;
 import com.classpick.web.lecture.dao.ILectureRepository;
 import com.classpick.web.lecture.model.Lecture;
 import com.classpick.web.lecture.model.LectureFile;
@@ -154,10 +159,25 @@ public class LectureService implements ILectureService {
         }
     }
 
-    @Override
-    public void buyLecture(Map<String, Long> params) {
+    @Transactional
+    public ResponseEntity<ResponseDto> buyLecture(Map<String, Long> params) {
+        // 중복 구매 확인
+        if (checkBeforeBuyLecture(params)) {
+            return ResponseDto.alreadyBuyed();
+        }
+
+        // 잔여 좌석 조회 (for update)
+        Integer seats = lectureDao.getSeatsForUpdate(params.get("lectureId"));
+
+        if (seats == null || seats <= 0) {
+            throw new RuntimeException("좌석이 모두 매진되었습니다.");
+        }
+
+        // 좌석 차감 및 결제 처리
         lectureDao.buyLecture(params);
         lectureDao.insertPayLog(params);
+
+        return ResponseEntity.ok(new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
 
     @Override

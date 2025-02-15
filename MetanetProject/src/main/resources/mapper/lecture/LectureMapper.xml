@@ -318,6 +318,17 @@
         INSERT INTO attends ( member_id , lecture_id ) VALUES ( #{ memberId } , #{ lectureId } )
     ]]>
     </insert>
+    
+    <select id="getSeatsForUpdate" parameterType="map" resultType="java.lang.Integer">
+        <![CDATA[
+            SELECT l.limit_student - COALESCE(COUNT(a.member_id), 0) AS remaining_seats
+            FROM lectures l
+            LEFT JOIN attends a ON l.lecture_id = a.lecture_id
+            WHERE l.lecture_id = #{lectureId}
+            GROUP BY l.lecture_id
+            FOR UPDATE
+        ]]>
+    </select>
 
     <select id="checkBeforeBuyLecture" parameterType="map" resultType="boolean">
     <![CDATA[

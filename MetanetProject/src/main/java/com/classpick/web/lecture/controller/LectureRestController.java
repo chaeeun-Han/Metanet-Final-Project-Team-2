@@ -74,7 +74,7 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
-    // 태그들 조회회 -- 고범준
+    // 태그들 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @GetMapping("/get-tags")
     public ResponseEntity<ResponseDto> getTags() {
@@ -511,40 +511,30 @@ public class LectureRestController {
         return ResponseEntity.ok(responseBody);
     }
 
-    // 강의 삭제 Json -- 고범준
-    @SuppressWarnings({ "rawtypes" })
+    // 강의 구매 - 고범준 (한채은 수정)
     @PostMapping("/buy/{lecture_id}")
     public ResponseEntity<ResponseDto> buyLecture(@PathVariable("lecture_id") Long lectureId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String memberId = "";
-
-        if (authentication != null) {
-            // 현재 인증된 사용자 정보
-            memberId = authentication.getName();
-            log.info(memberId);
-        }
-        if (memberId == null)
+        if (authentication == null || authentication.getName() == null) {
             return ResponseDto.noAuthentication();
+        }
 
-        Long member_id = lectureService.getMemberIdById(memberId);
+        String memberId = authentication.getName();
+        Long memberUID = lectureService.getMemberIdById(memberId);
 
-        Map<String, Long> params = new HashMap<String, Long>();
-        params.put("memberId", member_id);
+        Map<String, Long> params = new HashMap<>();
+        params.put("memberId", memberUID);
         params.put("lectureId", lectureId);
+
         try {
-            if (lectureService.checkBeforeBuyLecture(params)) {
-                return ResponseDto.alreadyBuyed();
-            }
-            lectureService.buyLecture(params);
+            return lectureService.buyLecture(params);
         } catch (Exception e) {
             return ResponseDto.databaseError();
         }
-        ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.ok(responseBody);
     }
 
-    // 환불하기기 -- 고범준
+    // 환불하기 -- 고범준
     @SuppressWarnings({ "rawtypes" })
     @PostMapping("/refund/{lecture_id}")
     public ResponseEntity<ResponseDto> lectureRefund(@PathVariable("lecture_id") Long lectureId) {
