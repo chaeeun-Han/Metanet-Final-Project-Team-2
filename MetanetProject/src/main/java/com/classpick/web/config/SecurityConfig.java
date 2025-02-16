@@ -40,7 +40,7 @@ public class SecurityConfig {
 		// 인가 규칙 설정
 		http.authorizeHttpRequests(auth -> auth
 			.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-			.requestMatchers("/auth/**").permitAll()
+			.requestMatchers("/auth/login", "auth/**").permitAll()
 			.requestMatchers("/email/**").permitAll()
 			.requestMatchers("/account/lecture", "/account/category", "/account/update", "/account", "/account/pay-log"
 					,"/account/my-study").hasAnyRole("Student", "Teacher", "Admin")
