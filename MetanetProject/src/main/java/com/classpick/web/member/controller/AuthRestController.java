@@ -34,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "https://bamjun.click", allowCredentials = "true")
 public class AuthRestController {
 
 	@Autowired
