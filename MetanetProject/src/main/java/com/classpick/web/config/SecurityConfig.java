@@ -40,6 +40,7 @@ public class SecurityConfig {
 		// 인가 규칙 설정
 		http.authorizeHttpRequests(auth -> auth
 			.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+			.requestMatchers("/public/**").permitAll()
 			.requestMatchers("/auth/**").permitAll()
 			.requestMatchers("/email/**").permitAll()
 			.requestMatchers("/account/lecture", "/account/category", "/account/update", "/account", "/account/pay-log"
@@ -79,16 +80,17 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("https://*.bamjun.click", "http://localhost:*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type" ,"skipInterceptor", "Cache-Control"));
-        configuration.setAllowCredentials(true);
+	public CorsConfigurationSource corsConfigurationSource() {
+	    CorsConfiguration configuration = new CorsConfiguration();
+	    configuration.setAllowedOriginPatterns(List.of("https://bamjun.click")); 
+	    configuration.setExposedHeaders(List.of("Authorization"));
+	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "skipInterceptor", "Cache-Control"));
+	    configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	    source.registerCorsConfiguration("/**", configuration);
+	    return source;
+	}
+
 }
