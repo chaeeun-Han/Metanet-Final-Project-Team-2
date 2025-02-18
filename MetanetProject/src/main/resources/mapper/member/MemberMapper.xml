@@ -2,18 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "../mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.myapp.member.dao.IMemberRepository">
+<mapper namespace="com.classpick.web.member.dao.IMemberRepository">
 
-	<insert id="insertMember" parameterType="com.example.myapp.member.model.Member">
-		<![CDATA[
-			INSERT INTO 
-				members (id, name, password, phone, email, role, deleted, birth, profile, bank) 
-			VALUES 
-				(#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank})
-		]]>
+	<insert id="insertMember" parameterType="com.classpick.web.member.model.Member">
+	    <![CDATA[
+	        INSERT INTO 
+	            members (id, name, password, phone, email, role, deleted, birth, profile, bank, attend_id)
+	        VALUES 
+	            (#{id}, #{name}, #{password}, #{phone}, #{email}, #{role}, 0, #{birth}, #{profile}, #{bank}, #{attendId})
+	    ]]>
 	</insert>
 
-	<select id="findById" resultType="com.example.myapp.member.model.Member">
+
+	<select id="findById" resultType="com.classpick.web.member.model.Member">
 		SELECT * FROM members WHERE id = #{id}
 	</select>
 	
@@ -50,15 +51,30 @@
 	</select>
 	
 	<update id="resetEmail">
-		UPDATE members
-		(email) SET #{email}
-		WHERE member_id = #{memberUID}  
+	    UPDATE members
+	    SET email = #{email}
+	    WHERE member_id = #{memberUID}
 	</update>
 
-	<select id="getAllMembers" resultType="com.example.myapp.member.model.MemberResponse">
+
+	<select id="getAllMembers" resultType="com.classpick.web.member.model.MemberResponse">
 		<![CDATA[
-			SELECT member_id AS memberId, CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
+			SELECT member_id AS memberId, id as id,CONCAT(LEFT(phone, 4), '****', RIGHT(phone, 5)) AS phone, email, role, name
 			FROM members
+		]]>
+	</select>
+
+	<select id="getMembersByLecture" parameterType="Long" resultType="com.classpick.web.excel.model.MemberForExcel">
+		<![CDATA[
+			SELECT 
+				k.title,
+			    CONCAT(LEFT(l.phone, 4), '****', RIGHT(l.phone, 5)) AS phone, 
+			    l.email, 
+			    l.name
+			FROM members l
+			LEFT JOIN attends m ON m.member_id = l.member_id
+			LEFT JOIN lectures k ON m.lecture_id = k.lecture_id
+			WHERE m.lecture_id = #{lectureId};
 		]]>
 	</select>
 	
@@ -76,10 +92,56 @@
         	WHERE role <> 'admin'
 		]]>
 	</delete>
-
+	
 	<select id="getIdByMemberId" resultType="string">
 		SELECT id
 		FROM members
-		WHERE member_id = #{memberId}
+		WHERE member_id = #{memberUID}
 	</select>
+	
+	<select id="getAttendIdById" resultType="string">
+		SELECT attend_id AS attendId
+		FROM members
+		WHERE member_id = #{memberUID}
+	</select>
+
+	<select id="getToolMember" resultType="com.classpick.web.member.model.Member">
+		SELECT profile, name, role, email, phone, birth, bank
+		FROM members
+		WHERE member_id = #{memberUID}	
+	</select>
+	
+	<select id="findByUserId" resultType="com.classpick.web.member.model.Member">
+		SELECT * FROM members WHERE id = #{id}
+	</select>
+
+	<select id="isEmailDuplicated" resultType="int">
+		SELECT COUNT(*) from members
+		WHERE email = #{email}
+	</select>
+	
+	<select id="getMemDashboard" resultType="com.classpick.web.admin.model.MemDashboard">
+		SELECT 
+		    CASE 
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 10 AND 19 THEN '10대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 20 AND 29 THEN '20대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 30 AND 39 THEN '30대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 40 AND 49 THEN '40대'
+		        WHEN TIMESTAMPDIFF(YEAR, birth, CURDATE()) BETWEEN 50 AND 59 THEN '50대'
+		        ELSE '기타'
+		    END AS year,
+		    COUNT(*) AS memNum
+		FROM members
+		WHERE deleted = FALSE 
+		GROUP BY year
+		ORDER BY year;	
+	</select>
+		
+	<select id="getStudentTeacherDashboard" resultType="com.classpick.web.admin.model.StudentTeacherDashboard">	
+	    SELECT 
+	        COUNT(CASE WHEN role = 'Student' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS Student,
+	        COUNT(CASE WHEN role = 'Teacher' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS Teacher
+	    FROM members;
+	</select>
+
 </mapper>
