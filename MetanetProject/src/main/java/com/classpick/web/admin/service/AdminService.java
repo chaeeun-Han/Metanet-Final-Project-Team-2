@@ -35,13 +35,17 @@ public class AdminService implements IAdminService{
 	ILectureRepository lectureRepository;
 	
 	// 회원 전체 조회
-	@Override
-	public ResponseEntity<ResponseDto> getAllMembers() {
-		List<MemberResponse> members = memberRepository.getAllMembers();
-		ResponseDto<List<MemberResponse>> responseBody = new ResponseDto<List<MemberResponse>>(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, members);
-		return ResponseEntity.ok(responseBody);
-	}
-
+    @Override
+    public ResponseEntity<ResponseDto> getAllMembers() {
+       try {
+          List<MemberResponse> members = memberRepository.getAllMembers();
+          ResponseDto<List<MemberResponse>> responseBody = new ResponseDto<List<MemberResponse>>(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, members);
+          return ResponseEntity.ok(responseBody);
+       } catch(Exception e) {
+          e.printStackTrace();
+          return ResponseDto.databaseError();
+       }
+    }
 	// 회원 삭제
 	@Override
 	@Transactional

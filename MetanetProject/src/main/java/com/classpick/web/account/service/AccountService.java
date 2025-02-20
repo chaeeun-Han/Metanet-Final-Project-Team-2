@@ -24,18 +24,16 @@ import com.classpick.web.common.response.ResponseMessage;
 import com.classpick.web.member.dao.IMemberRepository;
 import com.classpick.web.util.S3FileUploader;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AccountService implements IAccountService {
 
-	@Autowired
-	IAccountRepository accountRepository;
-
-	@Autowired
-	IMemberRepository memberRepository;
-
-	@Autowired
-	S3FileUploader s3FileUploader;
-
+	private final IAccountRepository accountRepository;
+	private final IMemberRepository memberRepository;
+	private final S3FileUploader s3FileUploader;
+	
 	@Override
 	public ResponseEntity<ResponseDto> getLecture(String memberId) {
 		List<AccountLecture> result = null;
