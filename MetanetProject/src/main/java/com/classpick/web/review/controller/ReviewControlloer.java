@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @RestController
-@RequestMapping("/lectures")
+@RequestMapping("/api/lectures")
 public class ReviewControlloer {
 
     @Autowired

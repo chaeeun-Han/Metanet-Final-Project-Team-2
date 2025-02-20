@@ -14,7 +14,7 @@ import com.classpick.web.member.dao.IMemberRepository;
 import com.classpick.web.util.GetAuthenUser;
 
 @RestController
-@RequestMapping("/certification")
+@RequestMapping("/api/certification")
 public class CertificationController {
 
 	@Autowired

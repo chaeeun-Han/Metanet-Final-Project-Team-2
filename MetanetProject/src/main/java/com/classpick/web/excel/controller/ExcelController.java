@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@RequestMapping("/excel")
+@RequestMapping("/api/excel")
 public class ExcelController {
 
     @Autowired

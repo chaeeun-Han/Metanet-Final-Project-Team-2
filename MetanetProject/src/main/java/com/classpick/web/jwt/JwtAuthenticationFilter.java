@@ -27,9 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 private final JwtTokenProvider jwtTokenProvider;
    private final AntPathMatcher pathMatcher = new AntPathMatcher();
-   public final static List<String> ACCEPTED_URL_LIST = List.of("/auth/join", "/auth/login", "/auth/password",
-           "/auth/re-access-token", "/auth/delete","/email/send", "/email/verify", "/email/mail-password",
-           "/ws/**", "/zoom/auth", "/zoom/oauth2/callback", "/error", "/favicon.ico");
+   public final static List<String> ACCEPTED_URL_LIST = List.of("/api/auth/join", "/api/auth/login", "/api/auth/password",
+           "/api/auth/re-access-token", "/api/auth/delete","/api/email/send", "/api/email/verify", "/api/email/mail-password",
+           "/ws/**", "/api/zoom/auth", "/api/zoom/oauth2/callback", "/error", "/favicon.ico");
 
    @Override
    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -58,10 +58,10 @@ private final JwtTokenProvider jwtTokenProvider;
        }
        
        if (!isAcceptedUrl && "GET".equalsIgnoreCase(method)) {
-           if (pathMatcher.match("/lectures/**", requestURI) ||  // 전체 lectures 경로 허용
-               pathMatcher.match("/lectures/*/reviews", requestURI) ||
-               pathMatcher.match("/lectures/*/questions", requestURI) ||
-               pathMatcher.match("/lectures/*/questions/*", requestURI)) {
+           if (pathMatcher.match("/api/lectures/**", requestURI) ||  // 전체 lectures 경로 허용
+               pathMatcher.match("/api/lectures/*/reviews", requestURI) ||
+               pathMatcher.match("/api/lectures/*/questions", requestURI) ||
+               pathMatcher.match("/api/lectures/*/questions/*", requestURI)) {
                isAcceptedUrl = true;
            }
        }
