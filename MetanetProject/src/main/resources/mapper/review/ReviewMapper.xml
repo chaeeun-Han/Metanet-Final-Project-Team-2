@@ -17,6 +17,7 @@
         l.review_id as reviewId, 
         l.lecture_id as lectureId, 
         l.member_id as memberId, 
+        k.id,
         k.profile, 
         l.content, 
         l.review_date as reviewDate, 

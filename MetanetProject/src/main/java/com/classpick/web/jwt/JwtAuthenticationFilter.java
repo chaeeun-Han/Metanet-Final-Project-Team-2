@@ -40,7 +40,8 @@ private final JwtTokenProvider jwtTokenProvider;
        String token = resolveToken(httpRequest);
 
        // 2. 허용된 URL일 경우 JWT 토큰 검증을 건너뛰기
-       String requestURI = httpRequest.getRequestURI();      
+       String requestURI = httpRequest.getRequestURI();    
+       System.out.println("requestURI" + requestURI);
        List<String> acceptedUrls = ACCEPTED_URL_LIST;
        String method = httpRequest.getMethod();
 
@@ -48,8 +49,9 @@ private final JwtTokenProvider jwtTokenProvider;
        boolean isAcceptedUrl = false; 
 
        // 허용된 URL 목록에 대해 순차적으로 확인
-       for (String acceptedUrl : acceptedUrls) {               
-           if (pathMatcher.match(acceptedUrl, requestURI)) {
+       for (String acceptedUrl : acceptedUrls) {
+    	   System.out.println("acceptedURL" + acceptedUrl);
+           if (pathMatcher.match(acceptedUrl, requestURI)) {        	  
                isAcceptedUrl = true; 
                break;  
            }

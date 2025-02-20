@@ -350,7 +350,6 @@ public class MemberService implements IMemberService {
 		ResponseDto responseBody = new ResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS, toolbarMember);
 		return ResponseEntity.ok(responseBody);
 	}
-
 	public boolean isEmailDuplicated(String email) {
 		int result = memberRepository.isEmailDuplicated(email);
 		if(result != 0) {
@@ -359,4 +358,5 @@ public class MemberService implements IMemberService {
 			return false;
 		}		
 	}
+
 }

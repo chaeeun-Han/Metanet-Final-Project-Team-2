@@ -5,7 +5,7 @@
 <mapper namespace="com.classpick.web.account.dao.IAccountRepository">
 
 	<select id="getLecture" resultType="com.classpick.web.account.model.AccountLecture">
-		SELECT l.title as title, l.profile as profile, l.category as category, a.is_coursable as isCoursable
+		SELECT l.title as title, l.profile as profile, l.category as category, a.is_coursable as isCoursable, a.lecture_id as lectureId
 		FROM lectures l
 		JOIN attends a ON l.lecture_id = a.lecture_id
 		WHERE a.member_id =#{memberId}
@@ -33,7 +33,7 @@
 	</select>
 	
 	<select id="getPaylog" resultType="com.classpick.web.account.model.Pay">
-		SELECT p.pay_id as payId, p.status as status, p.price as price, l.start_date as startDate, l.end_date as endDate, l.title, l.profile
+		SELECT p.pay_id as payId, p.status as status, p.price as price, l.start_date as startDate, l.end_date as endDate, l.title, l.profile, l.lecture_id as lectureId
 		FROM attends a
 		JOIN lectures l ON l.lecture_id = a.lecture_id
 		JOIN pays p ON p.lecture_id = a.lecture_id
@@ -64,12 +64,15 @@
 		WHERE s.member_id =#{memberUID} AND lec.lecture_id =#{lecture_id};	
 	</select>
 	
-	
 	<select id="getDueToLectures" resultType="com.classpick.web.account.model.DueToLecture">
-		SELECT title, start_date as startDate, end_date as endDate
-		FROM lectures 
-		WHERE member_id =#{teacherId}
-	</select>
+      <![CDATA[
+	      SELECT title, start_date as startDate, end_date as endDate
+	      FROM lectures 
+	      WHERE member_id =#{teacherId}
+	      and start_date > CURDATE()
+      ]]>
+   </select>
+
 	
 	<select id="getIngLectures" resultType="com.classpick.web.account.model.IngLecture">
 	    <![CDATA[
@@ -83,8 +86,8 @@
 	    JOIN lecture_lists ll ON lec.lecture_id = ll.lecture_id
 	    LEFT JOIN students s ON ll.lecture_list_id = s.lecture_list_id
 	    WHERE lec.member_id = #{teacherId}
-	    AND DATE(lec.start_date) <= CURDATE()
-	    AND DATE(lec.end_date) >= CURDATE()
+	    AND DATE(lec.start_date) <= NOW()
+		AND DATE(lec.end_date) >= NOW()	    
 	    GROUP BY ll.lecture_list_id, lec.lecture_id, ll.title, ll.start_time, ll.end_time, lec.start_date, lec.end_date;
 	    ]]>
 	</select>

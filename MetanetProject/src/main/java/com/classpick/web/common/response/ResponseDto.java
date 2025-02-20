@@ -17,6 +17,9 @@ public class ResponseDto<T> {
     private String message;
     private T data;
 
+    public ResponseDto (String code) {
+    	this.code = code;
+    }
     public ResponseDto(String code, String message) {
         this.code = code;
         this.message = message;
