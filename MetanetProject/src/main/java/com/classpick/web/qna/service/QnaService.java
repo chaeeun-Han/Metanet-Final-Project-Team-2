@@ -72,7 +72,7 @@ public class QnaService implements IQnaService {
       //알림 생성
       Lecture lecture = lectureRepository.getLectureDetail(lectureId);
         String receiverUsername = memberRepository.getIdByMemberId(lecture.getMemberId());
-        System.out.println(receiverUsername);
+      
         Notification notification = new Notification();
         notification.setMessage("['" + lecture.getTitle() + "' 강의에 질문이 등록되었습니다]  " + question.getTitle());
         notification.setTimestamp(LocalDateTime.now());
@@ -117,7 +117,7 @@ public class QnaService implements IQnaService {
       //알림 생성
       Long questionMemberUID = qnaRepository.getMemberIdByQuestionId(questionId);
       String receiverUsername = memberRepository.getIdByMemberId(questionMemberUID);
-      System.out.println(receiverUsername);
+     
       String questionTitle = qnaRepository.getQuestionTitle(questionId);
       Notification notification = new Notification();
       notification.setMessage("['" + questionTitle + "' 질문에 " + memberId

@@ -56,7 +56,7 @@ public class CertificationService implements ICertificationService {
         String fontPath = new ClassPathResource("/pdf/NanumBarunGothic.ttf")
                     .getURL()
                     .toString();
-        System.out.println("fontPath" + fontPath);
+      
         // 한글 폰트를 설정 (폰트 경로, 인코딩, 내장 여부)
         renderer.getFontResolver().addFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
