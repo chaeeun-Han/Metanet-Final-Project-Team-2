@@ -88,12 +88,7 @@ public class AccountController {
                 // Redis에 데이터가 없으면 DB에서 조회
                 List<LectureRevenueDto> monthlySales = lectureRepository.getSalesForMember(memberUID);
                 
-             // totalData의 내용 출력 (디버깅용)
-                monthlySales.forEach(data -> {
-                    System.out.println("Month: " + data.getMonth());
-                    System.out.println("Price: " + data.getPrice());
-                });
-
+          
                 // DB에서 조회된 데이터를 Redis에 저장
                 try {
                     jsonData = objectMapper.writeValueAsString(monthlySales);
