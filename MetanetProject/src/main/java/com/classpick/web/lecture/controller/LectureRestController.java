@@ -61,7 +61,7 @@ public class LectureRestController {
 
     // 전체 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = "application/json")
     public ResponseEntity<ResponseDto> getAllLectures() {
 
         Map<String, List<Lecture>> lecture = new HashMap<String, List<Lecture>>();
@@ -76,7 +76,7 @@ public class LectureRestController {
 
     // 태그들 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @GetMapping("/get-tags")
+    @GetMapping(value = "/get-tags" , produces = "application/json")
     public ResponseEntity<ResponseDto> getTags() {
         List<Tag> tags = new ArrayList<Tag>();
 
@@ -91,7 +91,7 @@ public class LectureRestController {
 
     // 특정 강의 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @GetMapping("/{lecture_id}")
+    @GetMapping(value = "/{lecture_id}", produces = "application/json")
     public ResponseEntity<ResponseDto> getLectureDetail(@PathVariable("lecture_id") Long lectureId) {
 
         Lecture lecture = new Lecture();
@@ -106,7 +106,7 @@ public class LectureRestController {
 
     // 특정 강의 강의 일정 조회 -- 고범준
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    @GetMapping("/lectureLists/{lecture_id}")
+    @GetMapping(value= "/lectureLists/{lecture_id}", produces = "application/json")
     public ResponseEntity<ResponseDto> getLectureLists(@PathVariable("lecture_id") Long lectureId) {
         List<LectureList> lectureLists = new ArrayList<LectureList>();
         try {
@@ -179,7 +179,7 @@ public class LectureRestController {
 
     // 강의 자료 리스트 -- 고범준
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    @GetMapping("/data/{lecture_id}")
+    @GetMapping(value= "/data/{lecture_id}", produces = "application/json")
     public ResponseEntity<ResponseDto> getLectureFiles(
             @PathVariable("lecture_id") Long lectureId) {
 
