@@ -12,7 +12,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		try {
 			String email= (String) request.getSession().getAttribute("email");
 			if(email == null || email.equals("")){
-				response.sendRedirect(request.getContextPath()+"/member/login");
+				response.sendRedirect(request.getContextPath()+"/api/member/login");
 				return false;
 			}
 		} catch (Exception e) {

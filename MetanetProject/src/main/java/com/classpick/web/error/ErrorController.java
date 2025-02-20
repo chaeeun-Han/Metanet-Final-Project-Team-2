@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.classpick.web.common.response.ResponseDto;
 @Controller
-@RequestMapping("/access-denied")
+@RequestMapping("/api/access-denied")
 public class ErrorController {
     
     @GetMapping("/{errorCode}")
