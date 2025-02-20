@@ -55,13 +55,13 @@ class CertificationServiceTest {
         certification.setEnd_date("2024-03-01");
 
         when(certificationRepository.getNameByUser(anyLong())).thenReturn(memberName);
-        when(certificationRepository.getLecutre_title(anyString(), anyString())).thenReturn(certification);
+        when(certificationRepository.getLecutre_title(anyString(), anyLong())).thenReturn(certification);
 
         byte[] mockPdf = new byte[]{1, 2, 3};
         CertificationService spyService = spy(certificationService);
         doReturn(mockPdf).when(spyService).generatePdfFromHtml(anyString());
 
-        byte[] result = spyService.getCertification(1L, "L123");
+        byte[] result = spyService.getCertification(1L, 1L);
 
         assertNotNull(result);
         assertEquals(mockPdf.length, result.length);
@@ -76,12 +76,12 @@ class CertificationServiceTest {
         certification.setEnd_date("2024-03-01");
 
         when(certificationRepository.getNameByUser(anyLong())).thenReturn(memberName);
-        when(certificationRepository.getLecutre_title(anyString(), anyString())).thenReturn(certification);
+        when(certificationRepository.getLecutre_title(anyString(), anyLong())).thenReturn(certification);
 
         CertificationService spyService = spy(certificationService);
         doThrow(new DocumentException("PDF 생성 실패")).when(spyService).generatePdfFromHtml(anyString());
 
-        byte[] result = spyService.getCertification(1L, "L123");
+        byte[] result = spyService.getCertification(1L, 1L);
 
         assertNull(result);
     }
@@ -126,18 +126,18 @@ class CertificationServiceTest {
 
     @Test
     void checkCourable_ShouldReturnTrue_WhenUserIsEligible() {
-        when(certificationRepository.getCourseable(anyLong(), anyString())).thenReturn(true);
+        when(certificationRepository.getCourseable(anyLong(), anyLong())).thenReturn(true);
 
-        boolean result = certificationService.checkCourable(1L, "L123");
+        boolean result = certificationService.checkCourable(1L, 1L);
 
         assertTrue(result);
     }
 
     @Test
     void checkCourable_ShouldReturnFalse_WhenUserIsNotEligible() {
-        when(certificationRepository.getCourseable(anyLong(), anyString())).thenReturn(false);
+        when(certificationRepository.getCourseable(anyLong(), anyLong())).thenReturn(false);
 
-        boolean result = certificationService.checkCourable(1L, "L123");
+        boolean result = certificationService.checkCourable(1L, 1L);
 
         assertFalse(result);
     }

@@ -51,8 +51,8 @@ class AdminServiceTest {
     @DisplayName("회원 전체 조회 - 성공")
     void getAllMembers_Success() {
         List<MemberResponse> mockMemberList = List.of(
-            new MemberResponse(1L, "010-1234-5678", "user1@email.com", "USER", "User One"),
-            new MemberResponse(2L, "010-9876-5432", "user2@email.com", "USER", "User Two")
+            new MemberResponse(1L, "010-1234-5678", "user1@email.com", "USER", "User One", null),
+            new MemberResponse(2L, "010-9876-5432", "user2@email.com", "USER", "User Two", null)
         );
 
         when(memberRepository.getAllMembers()).thenReturn(mockMemberList);

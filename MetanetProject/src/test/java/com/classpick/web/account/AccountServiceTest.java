@@ -55,7 +55,7 @@ class AccountServiceTest {
     @Test
     @DisplayName("강의 조회 - 성공")
     void getLecture_Success() {
-        List<AccountLecture> mockLectures = List.of(new AccountLecture("IT", "Java Basics", "profile.jpg", true));
+        List<AccountLecture> mockLectures = List.of(new AccountLecture("IT", "Java Basics", "profile.jpg", true, 2L));
         when(accountRepository.getLecture(testMemberId)).thenReturn(mockLectures);
         when(memberRepository.getMemberIdById(testUser)).thenReturn(testMemberId);
         ResponseEntity<ResponseDto> response = accountService.getLecture(testUser);
